@@ -1,23 +1,23 @@
 #include <chrono>
 #include <unordered_map>
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <cstdio>
 #include <cstring>
 #include <assert.h>
-#ifdef _WIN32
-#include <Windows.h>
-#endif
-#undef min
-#undef max
+#include <fstream>
+#include <string>
+#include <cstdlib> 
+#include <stdexcept>
 
 typedef unsigned int uint;
 typedef unsigned short ushort;
 typedef unsigned char uchar;
 
-#define MODELS_PATH INPUT_PATH "input/"
+#define DATA_PATH RESOURCES_PATH "input/data.txt"
 
-#define PROJECT_ERROR(message)																						  \
+#define PROJECT_ERROR(message) \
     {																									      \
         std::cerr << "Error at line " << __LINE__ << " in file " << MODELS_PATH << __FILE__ << ": " << message << std::endl; \
 		assert(0);																					  \
