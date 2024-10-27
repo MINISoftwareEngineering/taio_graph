@@ -1,4 +1,4 @@
-# TAIO-Graph - Graph analysis program
+﻿# TAIO-Graph - Graph analysis program
 
 ---
 
@@ -21,6 +21,16 @@ Group project for the lecture: Theory of Algorithms and Computations.
 
 ## Description
 description
+
+### Input format
+Dane wejściowe będą zapisane w formacie wspólnym dla wszystkich zespołów z założeniem wymienialności danych między zespołami.  
+Będą to pliki tekstowe zawierające opisy grafów (jednego lub więcej) oddzielone pustą linią.  
+Pierwszy wiersz pliku zawiera liczbę grafów zapisanych w pliku. Od drugiego wiersza zapisane są opisy grafów:  
+- pierwszy wiersz opisu zawiera liczbę wierzchołków, ta informacja jest zapisana w jednym wierszu pliku,  
+- następne wiersze pliku zawierają wiersze macierzy sąsiedztwa z elementami oddzielonymi spacją,  
+- po macierzy sąsiedztwa w kolejnych wierszach pliku mogą być zapisane dodatkowe dane.  
+W macierzy sąsiedztwa zapisane są liczby krawędzi między wierzchołkami (będzie 0 lub 1).  
+Dla grafów nieskierowanych macierz sąsiedztwa będzie symetryczna względem głównej przekątnej.  
 
 ---
 
