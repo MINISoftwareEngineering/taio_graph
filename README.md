@@ -10,7 +10,7 @@ Then select taio_graph.exe project and compile & run it.
 After creating exe file you can run it from Visual Studio or you can 
 open taio_graph.exe file in taio_graph/out/build/x64-Debug folder.
 
-By default project is compiled in a release mode.
+By default project is compiled in a release mode.  
 // TODO: remember to change CMakeLists.txt to PRODUCTION when finished
 
 ---
