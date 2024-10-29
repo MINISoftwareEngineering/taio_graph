@@ -35,6 +35,23 @@ The first line of the file contains the number of graphs in the file. Starting f
 The adjacency matrix records the number of edges between vertices (either 0 or 1).
 For undirected graphs, the adjacency matrix will be symmetrical along the main diagonal.
 
+### Example input file (data.txt)
+```
+3
+3
+0 1 1
+0 0 0
+1 0 0
+
+2
+0 1
+1 0
+
+3
+0 1 1
+0 0 1
+1 0 0
+```
 ---
 
 ## Showcase video
