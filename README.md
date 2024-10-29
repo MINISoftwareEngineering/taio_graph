@@ -60,5 +60,6 @@ video
 
 ---
 
-## Source links
-Repository social media graphics: https://media.architecturaldigest.com/photos/60537a17b05b9ecdd8227ff2/2:1/w_1280%2Cc_limit/Virtual_Networking_FINAL.jpg  
+### Source links
+Repository social media graphics:  
+https://media.architecturaldigest.com/photos/60537a17b05b9ecdd8227ff2/2:1/w_1280%2Cc_limit/Virtual_Networking_FINAL.jpg    
