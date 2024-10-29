@@ -3,7 +3,7 @@
 #include <graph_data.h>
 #include <input_manager/input_manager.h>
 
-struct GraphDataManager
+struct GraphsDataLoader
 {
     void loadGraphsData(std::vector<GraphData>& graphs_data);
 

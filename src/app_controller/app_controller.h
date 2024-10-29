@@ -2,7 +2,8 @@
 #include <config.h>
 #include <input_manager/input_manager.h>
 #include <console_manager/console_manager.h>
-#include <graph_data_manager/graph_data_manager.h>
+#include <graph_data_loader/graph_data_loader.h>
+#include <graph_manager/graph_manager.h>
 
 struct AppController
 {
@@ -11,6 +12,7 @@ struct AppController
 private:
     InputManager input_manager;
     ConsoleManager console_manager;
-    GraphDataManager graph_data_manager;
+    GraphManager graph_manager;
+    GraphsDataLoader graph_data_loader;
     std::vector<GraphData> graphs_data;
 };
