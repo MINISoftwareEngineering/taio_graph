@@ -8,5 +8,7 @@ struct GraphDataManager
     void loadGraphsData(std::vector<GraphData>& graphs_data);
 
 private:
+    InputManager input_manager;
+
     void loadGraphData(InputManager& input_manager, GraphData& graph_data);
 };

@@ -9,7 +9,6 @@ struct InputManager {
     void closeFile();
     bool reachedEOF();
 
-
 private:
     std::ifstream fileStream;
 };

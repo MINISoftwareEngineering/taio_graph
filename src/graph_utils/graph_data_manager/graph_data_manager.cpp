@@ -19,19 +19,18 @@ void GraphDataManager::loadGraphData(InputManager& input_manager, GraphData& gra
         input_manager.readLine(line);
             
         std::istringstream stream(line);
-        int value;
+        bool value;
 
         for (int col = 0; col < nodes_count; ++col)
         {
             stream >> value;
-            graph_data[row][col] = value != 0;
+            graph_data(row, col) = value;
         }
     }
 }
 
 void GraphDataManager::loadGraphsData(std::vector<GraphData>& graphs_data)
 {
-    InputManager input_manager;
     input_manager.openFile();
 
     std::string line;
@@ -50,5 +49,5 @@ void GraphDataManager::loadGraphsData(std::vector<GraphData>& graphs_data)
         }
     }
 
-    // TODO test this function
+    input_manager.closeFile();
 }

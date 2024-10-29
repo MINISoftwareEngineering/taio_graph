@@ -3,26 +3,16 @@
 
 struct GraphData
 {
-    // TODO fix (change to (x, y) instead of [x][y])
-
-    std::vector<bool>& operator[](size_t index) {
-        if (!initialized) {
+    std::vector<bool>::reference operator ()(size_t row_idx, size_t col_idx)
+    {
+        if (!initialized) 
             throw new std::runtime_error("GraphData not initialized.");
-        }
-        if (index >= relation_matrix.size()) {
-            throw std::out_of_range("Index out of range");
-        }
-        return relation_matrix[index];
-    }
+        if (col_idx >= relation_matrix.size()) 
+            throw std::out_of_range("Column index out of range.");
+        if (row_idx >= relation_matrix.size())
+            throw std::out_of_range("Row index out of range.");
 
-    std::vector<bool>& operator[](size_t index) {
-        if (!initialized) {
-            throw new std::runtime_error("GraphData not initialized.");
-        }
-        if (index >= relation_matrix.size()) {
-            throw std::out_of_range("Index out of range");
-        }
-        return relation_matrix[index];
+        return relation_matrix[row_idx][col_idx];
     }
 
 private:

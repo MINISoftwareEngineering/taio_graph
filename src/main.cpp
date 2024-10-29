@@ -1,21 +1,15 @@
 #include <config.h>
-#include <input_manager/input_manager.h>
-#include <console_manager/console_manager.h>
+#include <app_controller/app_controller.h>
+
+#include <filesystem>
 
 int main()
 {
-	InputManager input_manager;
-	ConsoleManager console_manager;
+	std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
+    
 
-	if (input_manager.inputFileExists())
-	{
-		console_manager.write("Input file detected\n");
-	}
-	else
-	{
-		console_manager.write("Create " DATA_PATH " file\n");
-	}
-	
+	AppController app_controller;
+	app_controller.run();
 
 	return EXIT_SUCCESS;
 }
