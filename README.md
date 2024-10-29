@@ -15,23 +15,25 @@ By default project is compiled in a release mode.
 ---
 
 ## Project intentions
-Group project for the lecture: Theory of Algorithms and Computations.
+For our group project in the Theory of Algorithms and Computations course, we aim to develop highly optimized algorithms for solutions and reasonably accurate approximations of solutions in heuristic-based algorithms. 
+We also focus on maintaining well-structured and well-documented code for improved readability.
 
 ---
 
 ## Description
-description
+// TODO: description
 
 ### Input format
-Dane wejściowe będą zapisane w formacie wspólnym dla wszystkich zespołów z założeniem wymienialności danych między zespołami. 
-Będą to pliki tekstowe zawierające opisy grafów (jednego lub więcej) oddzielone pustą linią. 
-Pierwszy wiersz pliku zawiera liczbę grafów zapisanych w pliku. Od drugiego wiersza zapisane są opisy grafów:  
-- pierwszy wiersz opisu zawiera liczbę wierzchołków, ta informacja jest zapisana w jednym wierszu pliku,  
-- następne wiersze pliku zawierają wiersze macierzy sąsiedztwa z elementami oddzielonymi spacją,  
-- po macierzy sąsiedztwa w kolejnych wierszach pliku mogą być zapisane dodatkowe dane.  
+
+The input data will be saved in a format common to all teams, ensuring data interchangeability between teams.
+These will be text files containing descriptions of one or more graphs, separated by an empty line.
+The first line of the file contains the number of graphs in the file. Starting from the second line, the graph descriptions are as follows:  
+- The first line of the description contains the number of vertices, recorded on a single line,  
+- The following lines contain rows of the adjacency matrix with elements separated by spaces,  
+- After the adjacency matrix, additional data may be recorded in subsequent lines of the file.
   
-W macierzy sąsiedztwa zapisane są liczby krawędzi między wierzchołkami (będzie 0 lub 1).  
-Dla grafów nieskierowanych macierz sąsiedztwa będzie symetryczna względem głównej przekątnej.  
+The adjacency matrix records the number of edges between vertices (either 0 or 1).
+For undirected graphs, the adjacency matrix will be symmetrical along the main diagonal.
 
 ---
 
