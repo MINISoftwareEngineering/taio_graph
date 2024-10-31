@@ -56,7 +56,9 @@ For undirected graphs, the adjacency matrix will be symmetrical along the main d
 ---
 
 ## Showcase video  
-video  
+// TODO: video  
+![Screenshot 2024-10-29 224418](https://github.com/user-attachments/assets/91ba5ba0-abec-436d-87a4-aecce921dc06)
+
 
 ---
 
