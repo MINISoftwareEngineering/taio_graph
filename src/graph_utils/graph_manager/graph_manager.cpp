@@ -116,3 +116,14 @@ bool GraphManager::isNodeWithoutInEdges(GraphData& graph_data, int node)
 	//}
 	//return false;
 }
+
+void GraphManager::findLongestCycles(GraphData& graph_data)
+{
+	throw new std::runtime_error("Method not implemented.");
+
+	std::vector<std::vector<int>> longest_cycles;
+	
+	// TODO: actually compute those cycles
+
+	graph_data.assignLongestCycles(longest_cycles);
+}

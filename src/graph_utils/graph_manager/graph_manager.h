@@ -8,4 +8,5 @@ struct GraphManager
 	void transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& graph_data);
 	bool isNodeWithoutOutEdges(GraphData& graph_data, int node_row);
 	bool isNodeWithoutInEdges(GraphData& graph_data, int node_col);
+	void findLongestCycles(GraphData& graph_data);
 };

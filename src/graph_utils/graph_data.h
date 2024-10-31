@@ -25,10 +25,29 @@ struct GraphData
         return relation_matrix[row_idx][col_idx];
     }
 
+    void assignLongestCycles(std::vector<std::vector<int>>& longest_cycles)
+    {
+        if (longest_cycles_assigned)
+            throw new std::runtime_error("Longest cycles already assigned.");
+
+        longest_cycles_assigned = true;
+        this->longest_cycles = longest_cycles;
+    }
+
+    const std::vector<std::vector<int>>& getLongestCycles()
+    {
+        if (!longest_cycles_assigned)
+            throw new std::runtime_error("Assign longest cycles first.");
+
+        return longest_cycles;
+    }
+
 private:
     bool initialized = false;
-    std::vector<std::vector<bool>> relation_matrix; // TO CONSIDER: remove it and leave only out/in_edges_by_node
+    bool longest_cycles_assigned = false;
     int nodes_count;
+    std::vector<std::vector<bool>> relation_matrix; // TO CONSIDER: remove it and leave only out/in_edges_by_node
+    std::vector<std::vector<int>> longest_cycles;
 
-    friend class GraphsDataLoader;
+    friend struct GraphsDataLoader;
 };

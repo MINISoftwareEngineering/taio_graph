@@ -19,7 +19,7 @@ struct ConsoleManager
         std::cout << text;
     }
 
-    void wait_for_enter()
+    void waitForEnter()
     {
         std::cout << "[Press Enter to continue]\n";
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -28,9 +28,9 @@ struct ConsoleManager
 
     void listGraphsSizes(std::vector<GraphData>& graphs_data)
     {
-        write("Graph sizes: \n");
+        write("| Graph sizes: \n");
         for (int i = 0; i < graphs_data.size(); ++i)
-            write("graph " + std::to_string(i) + " size: "
+            write("|- graph " + std::to_string(i) + " size: "
                 + std::to_string(graph_manager.getGraphSize(graphs_data[i])) + "\n");
     }
 

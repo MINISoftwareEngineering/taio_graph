@@ -1,6 +1,5 @@
 #include "app_controller.h"
 
-
 void AppController::run()
 {
     console_manager.clear();
@@ -23,6 +22,11 @@ void AppController::run()
 		graph_manager.transformToGraphWithoutEdgesAdjecentToLeafNode(graphs_data[i]);
 
 	console_manager.listGraphsSizes(graphs_data);
+	console_manager.waitForEnter();
 
-    console_manager.wait_for_enter();
+	console_manager.write("Finding all longest cycles...\n");
+	for (int i = 0; i < graphs_data.size(); ++i)
+		graph_manager.findLongestCycles(graphs_data[i]);
+
+    console_manager.waitForEnter();
 }
