@@ -11,12 +11,13 @@
 #include <stdexcept>
 #include <assert.h>
 #include <chrono>
+#include <filesystem>
 
 typedef unsigned int uint;
 typedef unsigned short ushort;
 typedef unsigned char uchar;
 
-#define DATA_PATH RESOURCES_PATH "input/data.txt"
+#define INPUT_FOLDER_PATH RESOURCES_PATH "input"
 
 #define PROJECT_ERROR(message) \
     {																									      \

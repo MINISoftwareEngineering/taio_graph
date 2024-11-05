@@ -2,22 +2,26 @@
 
 bool InputManager::inputFileExists()
 {
-    std::ifstream file(DATA_PATH);
-    return file.good();
+    for (const auto& entry : std::filesystem::directory_iterator(INPUT_FOLDER_PATH))
+    {
+        if (entry.is_regular_file())
+            return true;
+    }
+    return false;
 }
 
-void InputManager::openFile()
+void InputManager::openFile(std::string input_path)
 {
     if (fileStream.is_open()) 
     {
         closeFile();
     }
 
-    fileStream.open(DATA_PATH);
+    fileStream.open(input_path);
 
     if (!fileStream.is_open()) 
     {
-        throw std::runtime_error("Failed to open file: " DATA_PATH);
+        throw std::runtime_error("Failed to open file: " INPUT_FOLDER_PATH);
     }
 }
 
@@ -50,4 +54,13 @@ void InputManager::closeFile()
 bool InputManager::reachedEOF()
 {
     return fileStream.eof();
+}
+
+void InputManager::loadInputPaths(std::vector<std::string>& input_paths)
+{
+    for (const auto& entry : std::filesystem::directory_iterator(INPUT_FOLDER_PATH))
+    {
+        if (entry.is_regular_file())
+            input_paths.push_back(entry.path().string());
+    }
 }

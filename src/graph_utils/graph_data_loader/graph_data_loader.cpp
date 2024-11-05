@@ -40,9 +40,9 @@ void GraphsDataLoader::loadGraphData(InputManager& input_manager, GraphData& gra
     }
 }
 
-void GraphsDataLoader::loadGraphsData(std::vector<GraphData>& graphs_data)
+void GraphsDataLoader::loadGraphsFromFileData(std::vector<GraphData>& graphs_data, std::string input_path)
 {
-    input_manager.openFile();
+    input_manager.openFile(input_path);
 
     std::string line;
     input_manager.readLine(line);
@@ -61,4 +61,13 @@ void GraphsDataLoader::loadGraphsData(std::vector<GraphData>& graphs_data)
     }
 
     input_manager.closeFile();
+}
+
+void GraphsDataLoader::loadGraphsData(std::vector<GraphData>& graphs_data)
+{
+    std::vector<std::string> input_paths;
+    input_manager.loadInputPaths(input_paths);
+
+    for (const std::string& input_path : input_paths)
+        loadGraphsFromFileData(graphs_data, input_path);
 }
