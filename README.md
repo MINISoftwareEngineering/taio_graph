@@ -9,6 +9,7 @@ Open Project folder in Visual Studio, open CMakeLists.txt and press Ctrl + S.
 Then select taio_graph.exe project and compile & run it.
 After creating exe file you can run it from Visual Studio or you can 
 open taio_graph.exe file in taio_graph/out/build/x64-Debug folder.  
+  
 If you want to move taio_graph.exe file to other location you also need to copy resources folder to the same location when executable file was moved.  
 
 By default project is compiled in a release mode.  
