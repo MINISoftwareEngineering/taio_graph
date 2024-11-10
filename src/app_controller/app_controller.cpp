@@ -15,6 +15,14 @@ void AppController::run()
     console_manager.write("Loading input...\n");
     graph_data_loader.loadGraphsData(graphs_data);
 
+	console_manager.write("Finding minimum extention 3 times...\n");
+	for (int i = 0; i < 3; ++i)
+	{
+		GraphData graph_data = graphs_data[2];
+		console_manager.write(std::to_string(i) + " try: \n");
+		graph_manager.findMinimumExtentionForHamiltonCycle(graph_data);
+	}
+
 	console_manager.listGraphsSizes(graphs_data);
 
 	console_manager.write("Removing edges adjecent to leaf nodes...\n");
