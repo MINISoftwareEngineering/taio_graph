@@ -4,7 +4,10 @@
 int main()
 {
 	AppController app_controller;
-	app_controller.run();
+	RunData run_data;
+	run_data.hamilton.approx.retry_factor = 10;
+
+	app_controller.run(run_data);
 
 	return EXIT_SUCCESS;
 }

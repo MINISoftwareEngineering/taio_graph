@@ -42,7 +42,7 @@ struct ConsoleManager
             GraphData& graph_data = graphs_data[i];
             std::string hamilton_cycles_count = std::to_string(graph_data.getHamiltonCycles().size());
 
-            write("|- graph " + std::to_string(i + 1) + ": { hamilton_cycles_count: " + hamilton_cycles_count + ", extention: ");
+            write("|- graph " + std::to_string(i + 1) + ": { hamilton cycles: " + hamilton_cycles_count + ", extention: ");
             std::cout << graph_data.getHamiltonCycleGraphExtention();
             write(" } \n");
         }

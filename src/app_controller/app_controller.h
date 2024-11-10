@@ -5,9 +5,20 @@
 #include <graph_data_loader/graph_data_loader.h>
 #include <graph_manager/graph_manager.h>
 
+struct RunData
+{
+    struct
+    {
+        struct
+        {
+            int retry_factor = 1;
+        } approx;
+    } hamilton;
+};
+
 struct AppController
 {
-    void run();
+    void run(RunData& data);
 
 private:
     InputManager input_manager;
