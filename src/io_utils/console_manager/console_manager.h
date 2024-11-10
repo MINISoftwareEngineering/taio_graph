@@ -43,9 +43,7 @@ struct ConsoleManager
             std::string extentions_size = std::to_string(graph_data.getHamiltonCycleGraphExtentionsSize());
             std::string extentions_count = std::to_string(graph_data.getHamiltonCycleGraphExtentions().size());
 
-            write("|- graph ");
-            std::setw(7);
-            write(std::to_string(i + 1)
+            write("|- graph " + std::to_string(i + 1)
                 + ": { extentions_size: " + extentions_size 
                 + ", extentions_count: " + extentions_count + " } \n");
         }
