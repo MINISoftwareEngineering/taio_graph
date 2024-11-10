@@ -19,7 +19,7 @@ void AppController::run()
 	for (int i = 0; i < graphs_data.size(); ++i)
 		if (!graph_manager.tryFindMinimumExtentionForHamiltonCycle(graphs_data[i], 3))
 		{
-			console_manager.write("| Finding failed for graph " + std::to_string(i) + "! \n");
+			console_manager.write("|- Finding failed for graph " + std::to_string(i) + "! \n");
 		}
 
 	console_manager.listGraphsHamiltonCycleExtentions(graphs_data);

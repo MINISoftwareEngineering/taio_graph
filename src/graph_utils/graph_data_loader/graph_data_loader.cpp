@@ -13,7 +13,7 @@ void GraphsDataLoader::loadGraphData(InputManager& input_manager, GraphData& gra
 
     graph_data.initialized = true;
     graph_data.nodes_count = nodes_count;
-    graph_data.relation_matrix = std::vector(nodes_count, std::vector<bool>(nodes_count, false));
+    //graph_data.relation_matrix = std::vector(nodes_count, std::vector<bool>(nodes_count, false));
 
     for (int row = 0; row < nodes_count; ++row) // out_node idx
     {
@@ -25,7 +25,7 @@ void GraphsDataLoader::loadGraphData(InputManager& input_manager, GraphData& gra
         for (int col = 0; col < nodes_count; ++col) // in_node idx
         {
             stream >> value;
-            graph_data(row, col) = value;
+            //graph_data(row, col) = value;
 
             if (value)
             {

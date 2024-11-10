@@ -14,22 +14,22 @@ public:
             throw new std::runtime_error("GraphData not initialized.");
         return nodes_count;
     }
-    std::vector<bool>::reference operator ()(size_t row_idx, size_t col_idx)
-    {
-        if (!initialized) 
-            throw new std::runtime_error("GraphData not initialized.");
-        if (col_idx >= relation_matrix.size()) 
-            throw std::out_of_range("Column index out of range.");
-        if (row_idx >= relation_matrix.size())
-            throw std::out_of_range("Row index out of range.");
+    //std::vector<bool>::reference operator ()(size_t row_idx, size_t col_idx)
+    //{
+    //    if (!initialized) 
+    //        throw new std::runtime_error("GraphData not initialized.");
+    //    if (col_idx >= relation_matrix.size()) 
+    //        throw std::out_of_range("Column index out of range.");
+    //    if (row_idx >= relation_matrix.size())
+    //        throw std::out_of_range("Row index out of range.");
 
-        return relation_matrix[row_idx][col_idx];
-    }
+    //    return relation_matrix[row_idx][col_idx];
+    //}
 
 private:
     bool initialized = false;
     int nodes_count;
-    std::vector<std::vector<bool>> relation_matrix; // TO CONSIDER: remove it and leave only out/in_edges_by_node
+    //std::vector<std::vector<bool>> relation_matrix; // TO CONSIDER: remove it and leave only out/in_edges_by_node
 #pragma endregion
 
 #pragma region longestCycles
@@ -57,27 +57,39 @@ private:
 
 #pragma region hamiltonCycleApproximation
 public:
-    void addHamiltonCycleGraphExtention(graph_extention_t& graph_extention)
+    void setHamiltonCycleGraphExtention(graph_extention_t& graph_extention)
     {
-        hamilton_cycle_graph_extentions.insert(graph_extention);
+        hamilton_cycle_graph_extention_assigned = true;
+        hamilton_cycle_graph_extention = graph_extention;
+
+        hamilton_cycles.clear();
     }
-    void removeHamiltonCycleGraphExtentions()
+    int getHamiltonCycleGraphExtentionSize()
     {
-        hamilton_cycle_graph_extentions.clear();
+        if (hamilton_cycle_graph_extention_assigned)
+            return hamilton_cycle_graph_extention.size();
+        return -1;
     }
-    int getHamiltonCycleGraphExtentionsSize()
+    const graph_extention_t& getHamiltonCycleGraphExtention()
     {
-        if (hamilton_cycle_graph_extentions.empty())
-            return -1;
-        return hamilton_cycle_graph_extentions.begin()->size();
+        if (!hamilton_cycle_graph_extention_assigned)
+            throw new std::runtime_error("Longest cycles already assigned.");
+
+        return hamilton_cycle_graph_extention;
     }
-    const std::set<graph_extention_t>& getHamiltonCycleGraphExtentions()
+    void addHamiltonCycle(path_t& cycle)
     {
-        return hamilton_cycle_graph_extentions;
+        hamilton_cycles.insert(cycle);
+    }
+    const std::set<path_t>& getHamiltonCycles()
+    {
+        return hamilton_cycles;
     }
 
 private:
-    std::set<graph_extention_t> hamilton_cycle_graph_extentions;
+    bool hamilton_cycle_graph_extention_assigned = false;
+    graph_extention_t hamilton_cycle_graph_extention;
+    std::set<path_t> hamilton_cycles;
 #pragma endregion
 
     friend struct GraphsDataLoader;
