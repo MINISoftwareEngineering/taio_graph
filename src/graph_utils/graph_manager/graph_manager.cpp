@@ -213,12 +213,57 @@ bool GraphManager::tryGetRandomUnvisitedNode(int nodes_count, std::unordered_set
 	return getRandomValue(nodes_count - 1, random_unvisited_node, visited_nodes);
 }
 
-bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data, int retry_factor)
+bool GraphManager::tryFindMinimumExtentionForHamiltonCycleParallel(GraphData& graph_data, int retry_factor)
 {
-	// TODO: Make the loop iterations parallel
-	// TO CONSIDER: Implement it in CUDA
+	boost::asio::thread_pool pool(std::thread::hardware_concurrency() - 1);
+	boost::mutex mutex;
 
-	for (int i = 0; i < getEdgesDensityMetic(graph_data) * retry_factor; ++i)
+	std::atomic<bool> success = true;
+	int iterations = getEdgesDensityMetic(graph_data) * retry_factor;
+
+	for (int i = 0; i < iterations; ++i)
+	{
+		boost::asio::post(pool,
+			[&]()
+			{
+				if (!success) return;
+
+				int start_node;
+				if (!tryGetRandomNode(graph_data.getNodesCount(), start_node))
+				{
+					success = false;
+					return;
+				}
+
+				FollowRandomPathRecData rec_data = { start_node, graph_data };
+				followRandomPathRec(rec_data, start_node);
+
+				boost::unique_lock<boost::mutex> lock(mutex);
+				int current_extention_size = graph_data.getHamiltonCycleGraphExtentionsSize();
+				if (rec_data.graph_extention.size() < current_extention_size || current_extention_size == -1)
+				{
+					graph_data.removeHamiltonCycleGraphExtentions();
+					graph_data.addHamiltonCycleGraphExtention(rec_data.graph_extention);
+				}
+				else if (rec_data.graph_extention.size() == current_extention_size)
+				{
+					graph_data.addHamiltonCycleGraphExtention(rec_data.graph_extention);
+				}
+			});
+	}
+	pool.join();
+
+	return success;
+}
+
+bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data, int retry_factor, bool parallel_boost)
+{
+	if (parallel_boost)
+		return tryFindMinimumExtentionForHamiltonCycleParallel(graph_data, retry_factor);
+
+	int iterations = getEdgesDensityMetic(graph_data) * retry_factor;
+
+	for (int i = 0; i < iterations; ++i)
 	{
 		//std::cout << std::to_string(i) + " try: \n";
 

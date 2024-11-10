@@ -26,6 +26,7 @@ project(taio_graph)
 # DON'T ADD THE SOURCES BY HAND, they are already added with this macro
 file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
+add_subdirectory(thirdparty/boost)
 
 add_executable("${CMAKE_PROJECT_NAME}")
 
@@ -65,3 +66,10 @@ endif()
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/io_utils")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/graph_utils")
+
+
+set(BOOST_ROOT "${CMAKE_SOURCE_DIR}/thirdparty/boost")
+set(BOOST_INCLUDEDIR "${CMAKE_SOURCE_DIR}/thirdparty/boost/include")
+set(BOOST_LIBRARYDIR "${CMAKE_SOURCE_DIR}/thirdparty/boost/lib")
+
+target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE Boost::asio Boost::thread)

@@ -25,7 +25,7 @@ public:
 
 #pragma region hamiltonCycleApproximation
 public:
-	bool tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data, int retry_factor = 1);
+	bool tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data, int retry_factor = 1, bool parallel_boost = false);
 
 private:
 	struct FollowRandomPathRecData
@@ -35,6 +35,7 @@ private:
 		std::unordered_set<int> visited_nodes;
 		graph_extention_t graph_extention;
 	};
+	bool tryFindMinimumExtentionForHamiltonCycleParallel(GraphData& graph_data, int retry_factor);
 	bool tryGetRandomUnvisitedNode(int nodes_count, std::unordered_set<int>& visited_nodes, int& node_with_least_in_edges);
 	bool tryGetRandomUnvisitedNeighbourNode(GraphData& graph_data, int node, std::unordered_set<int>& visited_nodes, int& random_neighbour_node);
 	bool tryGetUnvisitedNodeWithLeastInEdges(GraphData& graph_data, std::unordered_set<int>& visited_nodes, int& random_unvisited_node);

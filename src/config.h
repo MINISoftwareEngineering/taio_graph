@@ -17,6 +17,10 @@
 #include <random>
 #include <iterator>
 #include <iomanip>
+#include <boost/asio/thread_pool.hpp>
+#include <boost/asio/post.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/chrono.hpp>
 
 typedef unsigned int uint;
 typedef unsigned short ushort;
