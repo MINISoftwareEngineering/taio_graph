@@ -20,7 +20,10 @@ void AppController::run()
 	{
 		GraphData graph_data = graphs_data[2];
 		console_manager.write(std::to_string(i) + " try: \n");
-		graph_manager.findMinimumExtentionForHamiltonCycle(graph_data);
+		if (!graph_manager.tryFindMinimumExtentionForHamiltonCycle(graph_data))
+		{
+			console_manager.write("Finding failed! \n");
+		}
 	}
 
 	console_manager.listGraphsSizes(graphs_data);

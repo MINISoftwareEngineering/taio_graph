@@ -128,29 +128,46 @@ void GraphManager::findLongestCycles(GraphData& graph_data)
 	graph_data.assignLongestCycles(longest_cycles);
 }
 
+bool GraphManager::tryGetRandomNode(int nodes_count, int& random_node)
+{
+	return getRandomValue(nodes_count - 1, random_node);
+}
+
 bool GraphManager::tryGetRandomUnvisitedNeighbourNode(GraphData& graph_data, int node, std::unordered_set<int>& visited_nodes, int& random_neighbour_node)
 {
 	return getRandomValue(graph_data.out_edges_by_node[node], random_neighbour_node, visited_nodes);
 }
 
-bool GraphManager::tryGetRandomUnvisitedNode(GraphData& graph_data, std::unordered_set<int> visited_nodes, int& random_unvisited_node)
+bool GraphManager::tryGetUnvisitedNodeWithLeastInEdges(GraphData& graph_data, std::unordered_set<int>& visited_nodes, int& node_with_least_in_edges)
 {
-	std::vector<int> unvisited_nodes;
-	for (int i = 0; i < graph_data.getNodesCount(); ++i)
-		if (visited_nodes.find(i) == visited_nodes.end())
-			unvisited_nodes.push_back(i);
+	// TODO: optimize to always keep track of unvisited nodes to avoid checking every node (visited_nodes & getNodesCount --> unvisited_nodes)
 
-	if (unvisited_nodes.empty()) {
-		random_unvisited_node = -1;
+	int least_in_edges = INT_MAX;
+
+	for (int node = 0; node < graph_data.getNodesCount(); ++node)
+		if (visited_nodes.find(node) == visited_nodes.end())
+		{
+			const auto& in_edges = graph_data.in_edges_by_node.find(node);
+			
+			if (in_edges != graph_data.in_edges_by_node.end() && in_edges->second.size() < least_in_edges)
+			{
+				least_in_edges = in_edges->second.size();
+				node_with_least_in_edges = node;
+			}
+		}
+
+	if (least_in_edges == INT_MAX)
+	{
+		node_with_least_in_edges = -1;
 		return false;
 	}
 
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> dis(0, unvisited_nodes.size() - 1);
-
-	random_unvisited_node = unvisited_nodes[dis(gen)];
 	return true;
+}
+
+bool GraphManager::tryGetRandomUnvisitedNode(int nodes_count, std::unordered_set<int>& visited_nodes, int& random_unvisited_node)
+{
+	return getRandomValue(nodes_count - 1, random_unvisited_node, visited_nodes);
 }
 
 void GraphManager::removeOutEdges(GraphData& graph_data, int node)
@@ -160,32 +177,35 @@ void GraphManager::removeOutEdges(GraphData& graph_data, int node)
 	graph_data.out_edges_by_node.erase(node);
 }
 
-void GraphManager::findMinimumExtentionForHamiltonCycle(GraphData& graph_data)
+bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data)
 {
-	std::unordered_set<int> visited_nodes;
-	std::vector<edge> graph_extention;
-	int start_node = graph_data.out_edges_by_node.begin()->first;
+	int start_node;
+	if (!tryGetRandomNode(graph_data.getNodesCount(), start_node))
+		return false;
 
-	followRandomPathRec(graph_data, visited_nodes, graph_extention, start_node, start_node);
+	FollowRandomPathRecData rec_data = { start_node, graph_data };
+	followRandomPathRec(rec_data, start_node);
+
+	return true;
 }
 
-void GraphManager::followRandomPathRec(GraphData& graph_data, std::unordered_set<int>& visited_nodes, std::vector<edge>& graph_extention, int start_node, int current_node)
+void GraphManager::followRandomPathRec(FollowRandomPathRecData& rec_data, int current_node)
 {
-	visited_nodes.insert(current_node);
+	rec_data.visited_nodes.insert(current_node);
 	std::cout << "visited node: " + std::to_string(current_node) + "\n";
 	
 	int next_node;
-	bool success = tryGetRandomUnvisitedNeighbourNode(graph_data, current_node, visited_nodes, next_node);
-	removeOutEdges(graph_data, current_node);
+	bool success = tryGetRandomUnvisitedNeighbourNode(rec_data.graph_data, current_node, rec_data.visited_nodes, next_node);
+	removeOutEdges(rec_data.graph_data, current_node);
 
 	if (!success)
 	{
-		if (!tryGetRandomUnvisitedNode(graph_data, visited_nodes, next_node))
+		if (!tryGetUnvisitedNodeWithLeastInEdges(rec_data.graph_data, rec_data.visited_nodes, next_node))
+		//if (!tryGetRandomUnvisitedNode(rec_data.graph_data.getNodesCount(), rec_data.visited_nodes, next_node))
 			return;
 
-		graph_extention.push_back({ current_node, next_node });
-		// getUnvisitedUnreachableNodeWithLeastInEdges();
+		rec_data.graph_extention.push_back({ current_node, next_node });
 	}
 
-	followRandomPathRec(graph_data, visited_nodes, graph_extention, start_node, next_node);
+	followRandomPathRec(rec_data, next_node);
 }
