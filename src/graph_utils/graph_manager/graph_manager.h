@@ -7,10 +7,10 @@ struct GraphManager
 #pragma region general
 public:
 	int getGraphSize(GraphData& graph_data);
+	
+private:
 	bool isNodeWithoutOutEdges(GraphData& graph_data, int node_row);
 	bool isNodeWithoutInEdges(GraphData& graph_data, int node_col);
-
-private:
 	void removeOutEdges(GraphData& graph_data, int node);
 	bool tryGetRandomNode(int nodes_count, int& random_node);
 #pragma endregion
