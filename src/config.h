@@ -17,6 +17,7 @@
 #include <random>
 #include <iterator>
 #include <iomanip>
+#include <math.h>
 
 typedef unsigned int uint;
 typedef unsigned short ushort;

@@ -10,6 +10,7 @@ public:
 	int getEdgesDensityMetic(GraphData& graph_data);
 	
 private:
+	void addEdge(GraphData& graph_data, edge new_edge);
 	bool isNodeWithoutOutEdges(GraphData& graph_data, int node_row);
 	bool isNodeWithoutInEdges(GraphData& graph_data, int node_col);
 	void removeOutEdges(GraphData& graph_data, int node);
@@ -40,6 +41,6 @@ private:
 	bool tryGetRandomUnvisitedNode(int nodes_count, std::unordered_set<int>& visited_nodes, int& node_with_least_in_edges);
 	bool tryGetRandomUnvisitedNeighbourNode(GraphData& graph_data, int node, std::unordered_set<int>& visited_nodes, int& random_neighbour_node);
 	bool tryGetUnvisitedNodeWithLeastInEdges(GraphData& graph_data, std::unordered_set<int>& visited_nodes, int& random_unvisited_node);
-	void followRandomPathRec(FollowRandomPathRecData& rec_data, int current_node);
+	void followRandomPathRec(FollowRandomPathRecData& rec_data, int current_node, bool allow_extending = true);
 #pragma endregion
 };

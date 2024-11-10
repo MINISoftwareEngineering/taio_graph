@@ -46,6 +46,12 @@ void GraphManager::removeOutEdges(GraphData& graph_data, int node)
 	graph_data.out_edges_by_node.erase(node);
 }
 
+void GraphManager::addEdge(GraphData& graph_data, edge new_edge)
+{
+	graph_data.in_edges_by_node[new_edge.out].insert(new_edge.in);
+	graph_data.out_edges_by_node[new_edge.in].insert(new_edge.out);
+}
+
 int GraphManager::getEdgesDensityMetic(GraphData& graph_data)
 {
 	// TO CONSIDER: can be O(1) if updated after every change in a graph
@@ -225,13 +231,24 @@ bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data
 			if (graph_data.getHamiltonCycleGraphExtention().empty())
 				break;
 		}
-		//else if (rec_data.graph_extention.size() == current_extention_size)
-		//{
-		//	graph_data.addHamiltonCycleGraphExtention(rec_data.graph_extention);
-		//}
 	}
 
-	// TODO: also search for all possible Hamilton cycles in the smallest extention
+	GraphData extended_graph_data = graph_data;
+	for each (edge e in graph_data.getHamiltonCycleGraphExtention())
+	{
+		addEdge(extended_graph_data, e);
+	}
+	
+	iterations = getGraphSize(extended_graph_data) * std::max((int)log2(retry_factor), 1);
+	transformToGraphWithoutEdgesAdjecentToLeafNode(extended_graph_data);
+	for (int i = 0; i < iterations; ++i)
+	{
+		FollowRandomPathRecData rec_data = { 0, graph_data };
+		followRandomPathRec(rec_data, 0, false);
+
+		if (rec_data.followed_path.size() > 0)
+			graph_data.addHamiltonCycle(rec_data.followed_path);
+	}
 
 	return true;
 }
@@ -242,7 +259,7 @@ void GraphManager::rotateCycleToStartFromTheSmallestIndex(path_t& cycle)
 	std::rotate(cycle.begin(), minIt, cycle.end());
 }
 
-void GraphManager::followRandomPathRec(FollowRandomPathRecData& rec_data, int current_node)
+void GraphManager::followRandomPathRec(FollowRandomPathRecData& rec_data, int current_node, bool allow_extending)
 {
 	rec_data.visited_nodes.insert(current_node);
 	rec_data.followed_path.push_back(current_node);
@@ -252,12 +269,22 @@ void GraphManager::followRandomPathRec(FollowRandomPathRecData& rec_data, int cu
 
 	int next_node;
 	bool success = tryGetRandomUnvisitedNeighbourNode(rec_data.graph_data, current_node, rec_data.visited_nodes, next_node);
-	removeOutEdges(rec_data.graph_data, current_node);
+	if (allow_extending)
+		removeOutEdges(rec_data.graph_data, current_node);
 
 	if (!success)
 	{
+		if (!allow_extending)
+		{
+			if (!has_edge_to_start_node || rec_data.followed_path.size() != rec_data.graph_data.getNodesCount())
+			{
+				rec_data.followed_path = {};
+				return;
+			}
+		}
+
+		//if (!tryGetRandomUnvisitedNode(rec_data.graph_data.getNodesCount(), rec_data.visited_nodes, next_node)) // for speedup, but might be less accurate
 		if (!tryGetUnvisitedNodeWithLeastInEdges(rec_data.graph_data, rec_data.visited_nodes, next_node))
-			//if (!tryGetRandomUnvisitedNode(rec_data.graph_data.getNodesCount(), rec_data.visited_nodes, next_node)) // for speedup, but might be less accurate
 		{
 			if (!has_edge_to_start_node)
 				rec_data.graph_extention.insert({ current_node, rec_data.start_node });
