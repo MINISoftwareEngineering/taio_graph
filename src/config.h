@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <unordered_set>
+#include <set>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -15,12 +16,27 @@
 #include <filesystem>
 #include <random>
 #include <iterator>
+#include <iomanip>
 
 typedef unsigned int uint;
 typedef unsigned short ushort;
 typedef unsigned char uchar;
+struct edge
+{
+    int in, out;
 
-typedef struct { int in, out; } edge;
+    bool operator==(const edge& other) const 
+    {
+        return in == other.in && out == other.out;
+    }
+
+    bool operator<(const edge& other) const 
+    {
+        return (in < other.in) || (in == other.in && out < other.out);
+    }
+};
+typedef std::set<edge> graph_extention_t;
+
 
 #define INPUT_FOLDER_PATH RESOURCES_PATH "input"
 

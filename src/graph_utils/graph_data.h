@@ -3,6 +3,8 @@
 
 struct GraphData
 {
+#pragma region general
+public:
     std::unordered_map<int, std::unordered_set<int>> out_edges_by_node;
     std::unordered_map<int, std::unordered_set<int>> in_edges_by_node;
 
@@ -12,7 +14,6 @@ struct GraphData
             throw new std::runtime_error("GraphData not initialized.");
         return nodes_count;
     }
-
     std::vector<bool>::reference operator ()(size_t row_idx, size_t col_idx)
     {
         if (!initialized) 
@@ -25,6 +26,14 @@ struct GraphData
         return relation_matrix[row_idx][col_idx];
     }
 
+private:
+    bool initialized = false;
+    int nodes_count;
+    std::vector<std::vector<bool>> relation_matrix; // TO CONSIDER: remove it and leave only out/in_edges_by_node
+#pragma endregion
+
+#pragma region longestCycles
+public:
     void assignLongestCycles(std::vector<std::vector<int>>& longest_cycles)
     {
         if (longest_cycles_assigned)
@@ -33,7 +42,6 @@ struct GraphData
         longest_cycles_assigned = true;
         this->longest_cycles = longest_cycles;
     }
-
     const std::vector<std::vector<int>>& getLongestCycles()
     {
         if (!longest_cycles_assigned)
@@ -43,11 +51,34 @@ struct GraphData
     }
 
 private:
-    bool initialized = false;
     bool longest_cycles_assigned = false;
-    int nodes_count;
-    std::vector<std::vector<bool>> relation_matrix; // TO CONSIDER: remove it and leave only out/in_edges_by_node
     std::vector<std::vector<int>> longest_cycles;
+#pragma endregion
+
+#pragma region hamiltonCycleApproximation
+public:
+    void addHamiltonCycleGraphExtention(graph_extention_t& graph_extention)
+    {
+        hamilton_cycle_graph_extentions.insert(graph_extention);
+    }
+    void removeHamiltonCycleGraphExtentions()
+    {
+        hamilton_cycle_graph_extentions.clear();
+    }
+    int getHamiltonCycleGraphExtentionsSize()
+    {
+        if (hamilton_cycle_graph_extentions.empty())
+            return -1;
+        return hamilton_cycle_graph_extentions.begin()->size();
+    }
+    const std::set<graph_extention_t>& getHamiltonCycleGraphExtentions()
+    {
+        return hamilton_cycle_graph_extentions;
+    }
+
+private:
+    std::set<graph_extention_t> hamilton_cycle_graph_extentions;
+#pragma endregion
 
     friend struct GraphsDataLoader;
 };

@@ -54,6 +54,31 @@ void GraphManager::removeOutEdges(GraphData& graph_data, int node)
 		graph_data.in_edges_by_node[in_node].erase(node);
 	graph_data.out_edges_by_node.erase(node);
 }
+
+int GraphManager::getEdgesDensityMetic(GraphData& graph_data)
+{
+	// TO CONSIDER: can be O(1) if updated after every change in a graph
+
+	if (graph_data.getNodesCount() == 0)
+		return -1;
+
+	int edges_count = 0;
+	for each (const auto& out_edges in graph_data.out_edges_by_node)
+	{
+		edges_count += out_edges.second.size();
+	}
+
+	int metric = edges_count / graph_data.getNodesCount();
+	if (metric * graph_data.getNodesCount() < edges_count)
+		metric += 1;
+
+	return metric;
+}
+
+bool GraphManager::hasEdge(GraphData& graph_data, int out_node, int in_node)
+{
+	return graph_data.out_edges_by_node[out_node].find(in_node) != graph_data.out_edges_by_node[out_node].end();
+}
 #pragma endregion
 
 #pragma region longestCycles
@@ -63,73 +88,73 @@ void GraphManager::transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& gra
 	std::vector<int> nodes_to_remove_out_edges;
 	std::vector<int> nodes_to_remove_in_edges;
 
-	do
+do
+{
+	any_edge_removed = false;
+	nodes_to_remove_in_edges.clear();
+	nodes_to_remove_out_edges.clear();
+
+	for each (const auto & in_pair in graph_data.in_edges_by_node)
 	{
-		any_edge_removed = false;
-		nodes_to_remove_in_edges.clear();
-		nodes_to_remove_out_edges.clear();
+		int in_node = in_pair.first;
+		const std::unordered_set<int>& in_edges = in_pair.second;
 
-		for each (const auto & in_pair in graph_data.in_edges_by_node)
+		if (isNodeWithoutOutEdges(graph_data, in_node))
 		{
-			int in_node = in_pair.first;
-			const std::unordered_set<int>& in_edges = in_pair.second;
-
-			if (isNodeWithoutOutEdges(graph_data, in_node))
+			for each (int out_node in in_edges)
 			{
-				for each (int out_node in in_edges)
-				{
-					graph_data.out_edges_by_node[out_node].erase(in_node);
+				graph_data.out_edges_by_node[out_node].erase(in_node);
 
-					if (graph_data.out_edges_by_node[out_node].empty())
-						graph_data.out_edges_by_node.erase(out_node);
-				}
-
-				nodes_to_remove_in_edges.push_back(in_node);
-			}
-		}
-
-		for each (int in_node in nodes_to_remove_in_edges)
-		{
-			for each (int out_node in graph_data.in_edges_by_node[in_node])
-			{
-				graph_data(out_node, in_node) = false;
+				if (graph_data.out_edges_by_node[out_node].empty())
+					graph_data.out_edges_by_node.erase(out_node);
 			}
 
-			graph_data.in_edges_by_node.erase(in_node);
-			any_edge_removed = true;
+			nodes_to_remove_in_edges.push_back(in_node);
 		}
+	}
 
-		for each (const auto & out_pair in graph_data.out_edges_by_node)
+	for each (int in_node in nodes_to_remove_in_edges)
+	{
+		for each (int out_node in graph_data.in_edges_by_node[in_node])
 		{
-			int out_node = out_pair.first;
-			const std::unordered_set<int>& out_edges = out_pair.second;
-
-			if (isNodeWithoutInEdges(graph_data, out_node))
-			{
-				for each (int in_node in out_edges)
-				{
-					graph_data.in_edges_by_node[in_node].erase(out_node);
-
-					if (graph_data.in_edges_by_node[in_node].empty())
-						graph_data.in_edges_by_node.erase(in_node);
-				}
-
-				nodes_to_remove_out_edges.push_back(out_node);
-			}
+			graph_data(out_node, in_node) = false;
 		}
 
-		for each (int out_node in nodes_to_remove_out_edges)
+		graph_data.in_edges_by_node.erase(in_node);
+		any_edge_removed = true;
+	}
+
+	for each (const auto & out_pair in graph_data.out_edges_by_node)
+	{
+		int out_node = out_pair.first;
+		const std::unordered_set<int>& out_edges = out_pair.second;
+
+		if (isNodeWithoutInEdges(graph_data, out_node))
 		{
-			for each (int in_node in graph_data.out_edges_by_node[out_node])
+			for each (int in_node in out_edges)
 			{
-				graph_data(out_node, in_node) = false;
+				graph_data.in_edges_by_node[in_node].erase(out_node);
+
+				if (graph_data.in_edges_by_node[in_node].empty())
+					graph_data.in_edges_by_node.erase(in_node);
 			}
 
-			graph_data.out_edges_by_node.erase(out_node);
-			any_edge_removed = true;
+			nodes_to_remove_out_edges.push_back(out_node);
+		}
+	}
+
+	for each (int out_node in nodes_to_remove_out_edges)
+	{
+		for each (int in_node in graph_data.out_edges_by_node[out_node])
+		{
+			graph_data(out_node, in_node) = false;
 		}
 
-	} while (any_edge_removed);
+		graph_data.out_edges_by_node.erase(out_node);
+		any_edge_removed = true;
+	}
+
+} while (any_edge_removed);
 }
 
 void GraphManager::findLongestCycles(GraphData& graph_data)
@@ -144,7 +169,7 @@ void GraphManager::findLongestCycles(GraphData& graph_data)
 }
 #pragma endregion
 
-#pragma region hamiltonCycleAproximation
+#pragma region hamiltonCycleApproximation
 bool GraphManager::tryGetRandomUnvisitedNeighbourNode(GraphData& graph_data, int node, std::unordered_set<int>& visited_nodes, int& random_neighbour_node)
 {
 	return getRandomValue(graph_data.out_edges_by_node[node], random_neighbour_node, visited_nodes);
@@ -161,7 +186,13 @@ bool GraphManager::tryGetUnvisitedNodeWithLeastInEdges(GraphData& graph_data, st
 		{
 			const auto& in_edges = graph_data.in_edges_by_node.find(node);
 
-			if (in_edges != graph_data.in_edges_by_node.end() && in_edges->second.size() < least_in_edges)
+			if (in_edges == graph_data.in_edges_by_node.end())
+			{
+				node_with_least_in_edges = node;
+				return true;
+			}
+
+			if (in_edges->second.size() < least_in_edges)
 			{
 				least_in_edges = in_edges->second.size();
 				node_with_least_in_edges = node;
@@ -182,14 +213,33 @@ bool GraphManager::tryGetRandomUnvisitedNode(int nodes_count, std::unordered_set
 	return getRandomValue(nodes_count - 1, random_unvisited_node, visited_nodes);
 }
 
-bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data)
+bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data, int retry_factor)
 {
-	int start_node;
-	if (!tryGetRandomNode(graph_data.getNodesCount(), start_node))
-		return false;
+	// TODO: Make the loop iterations parallel
+	// TO CONSIDER: Implement it in CUDA
 
-	FollowRandomPathRecData rec_data = { start_node, graph_data };
-	followRandomPathRec(rec_data, start_node);
+	for (int i = 0; i < getEdgesDensityMetic(graph_data) * retry_factor; ++i)
+	{
+		//std::cout << std::to_string(i) + " try: \n";
+
+		int start_node;
+		if (!tryGetRandomNode(graph_data.getNodesCount(), start_node))
+			return false;
+
+		FollowRandomPathRecData rec_data = { start_node, graph_data };
+		followRandomPathRec(rec_data, start_node);
+
+		int current_extention_size = graph_data.getHamiltonCycleGraphExtentionsSize();
+		if (rec_data.graph_extention.size() < current_extention_size || current_extention_size == -1)
+		{
+			graph_data.removeHamiltonCycleGraphExtentions();
+			graph_data.addHamiltonCycleGraphExtention(rec_data.graph_extention);
+		}
+		else if (rec_data.graph_extention.size() == current_extention_size)
+		{
+			graph_data.addHamiltonCycleGraphExtention(rec_data.graph_extention);
+		}
+	}
 
 	return true;
 }
@@ -197,7 +247,9 @@ bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data
 void GraphManager::followRandomPathRec(FollowRandomPathRecData& rec_data, int current_node)
 {
 	rec_data.visited_nodes.insert(current_node);
-	std::cout << "visited node: " + std::to_string(current_node) + "\n";
+	//std::cout << "visited node: " + std::to_string(current_node) + "\n";
+
+	bool has_edge_to_start_node = hasEdge(rec_data.graph_data, current_node, rec_data.start_node);
 
 	int next_node;
 	bool success = tryGetRandomUnvisitedNeighbourNode(rec_data.graph_data, current_node, rec_data.visited_nodes, next_node);
@@ -206,10 +258,15 @@ void GraphManager::followRandomPathRec(FollowRandomPathRecData& rec_data, int cu
 	if (!success)
 	{
 		if (!tryGetUnvisitedNodeWithLeastInEdges(rec_data.graph_data, rec_data.visited_nodes, next_node))
-			//if (!tryGetRandomUnvisitedNode(rec_data.graph_data.getNodesCount(), rec_data.visited_nodes, next_node))
-			return;
+			//if (!tryGetRandomUnvisitedNode(rec_data.graph_data.getNodesCount(), rec_data.visited_nodes, next_node)) // for speedup, but might be less accurate
+		{
+			if (!has_edge_to_start_node)
+				rec_data.graph_extention.insert({ current_node, rec_data.start_node });
 
-		rec_data.graph_extention.push_back({ current_node, next_node });
+			return;
+		}
+
+		rec_data.graph_extention.insert({ current_node, next_node });
 	}
 
 	followRandomPathRec(rec_data, next_node);

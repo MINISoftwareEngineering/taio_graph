@@ -15,18 +15,18 @@ void AppController::run()
     console_manager.write("Loading input...\n");
     graph_data_loader.loadGraphsData(graphs_data);
 
-	console_manager.write("Finding minimum extention 3 times...\n");
-	for (int i = 0; i < 3; ++i)
-	{
-		GraphData graph_data = graphs_data[2];
-		console_manager.write(std::to_string(i) + " try: \n");
-		if (!graph_manager.tryFindMinimumExtentionForHamiltonCycle(graph_data))
+	console_manager.write("Finding minimum extentions with retry factor=3...\n");
+	for (int i = 0; i < graphs_data.size(); ++i)
+		if (!graph_manager.tryFindMinimumExtentionForHamiltonCycle(graphs_data[i], 3))
 		{
-			console_manager.write("Finding failed! \n");
+			console_manager.write("| Finding failed for graph " + std::to_string(i) + "! \n");
 		}
-	}
+
+	console_manager.listGraphsHamiltonCycleExtentions(graphs_data);
+	console_manager.waitForEnter();
 
 	console_manager.listGraphsSizes(graphs_data);
+	console_manager.waitForEnter();
 
 	console_manager.write("Removing edges adjecent to leaf nodes...\n");
 	for (int i = 0; i < graphs_data.size(); ++i)
@@ -38,6 +38,5 @@ void AppController::run()
 	console_manager.write("Finding all longest cycles...\n");
 	for (int i = 0; i < graphs_data.size(); ++i)
 		graph_manager.findLongestCycles(graphs_data[i]);
-
     console_manager.waitForEnter();
 }
