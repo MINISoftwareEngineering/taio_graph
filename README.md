@@ -24,7 +24,20 @@ We also focus on maintaining well-structured and well-documented code for improv
 ---
 
 ## Description
-// TODO: description
+// TODO: description for all algorithms  
+
+### Finding smallest graph extention to Hamilton cycle approximation  
+This algorithm follows random path to unvisited nods. 
+When there is no more out-edges a new one is created. 
+That egde will lead to the node with least in-edges. 
+Random path creation is continued from newly connected node.  
+
+Path creation described above is run `max(graph metric, 1) * retry_factor` times. 
+From each try number of added edges is compared and only the smallest graph extention is saved.  
+
+In addition, after finding smallest graph extention a number of unique hamilton cycles in extended graph is computed.  
+It's also an approximation and cycles are also found by following random paths. 
+Paths that have desired lenght and the last node has out-edge to start node are added as unique cycle for the smallest graph extention that was found previously. 
 
 ### Input format
 
