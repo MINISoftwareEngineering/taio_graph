@@ -239,11 +239,11 @@ bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data
 		addEdge(extended_graph_data, e);
 	}
 	
-	iterations = getGraphSize(extended_graph_data) * std::max((int)log10(retry_factor), 1);
+	iterations = getGraphSize(extended_graph_data) * std::max((int)log(retry_factor), 1);
 	transformToGraphWithoutEdgesAdjecentToLeafNode(extended_graph_data);
 	for (int i = 0; i < iterations; ++i)
 	{
-		FollowRandomPathRecData rec_data = { 0, graph_data };
+		FollowRandomPathRecData rec_data = { 0, extended_graph_data };
 		followRandomPathRec(rec_data, 0, false);
 
 		if (rec_data.followed_path.size() > 0)
@@ -295,6 +295,6 @@ void GraphManager::followRandomPathRec(FollowRandomPathRecData& rec_data, int cu
 		rec_data.graph_extention.insert({ current_node, next_node });
 	}
 
-	followRandomPathRec(rec_data, next_node);
+	followRandomPathRec(rec_data, next_node, allow_extending);
 }
 #pragma endregion
