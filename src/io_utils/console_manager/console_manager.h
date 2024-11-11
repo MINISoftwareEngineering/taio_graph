@@ -86,10 +86,6 @@ struct ConsoleManager
             write("|  |- hamilton cycles: " + hamilton_cycles_count + " \n");
             write("|  |- smallest extention: \n"); 
             write(graph_data.getHamiltonCycleGraphExtention());
-
-            //write("|- graph " + std::to_string(i + 1) + ": { hamilton cycles: " + hamilton_cycles_count + ", extention: ");
-            //std::cout << graph_data.getHamiltonCycleGraphExtention();
-            //write(" } \n");
         }
     }
 
