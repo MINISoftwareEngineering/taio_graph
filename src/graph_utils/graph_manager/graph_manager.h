@@ -10,6 +10,7 @@ public:
 	int getEdgesDensityMetic(GraphData& graph_data);
 	
 private:
+	void transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& graph_data);
 	void addEdge(GraphData& graph_data, edge new_edge);
 	bool isNodeWithoutOutEdges(GraphData& graph_data, int node_row);
 	bool isNodeWithoutInEdges(GraphData& graph_data, int node_col);
@@ -21,7 +22,6 @@ private:
 #pragma region longestCycles
 public:
 	void findLongestCycles(GraphData& graph_data);
-	void transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& graph_data);
 #pragma endregion
 
 #pragma region hamiltonCycleApproximation

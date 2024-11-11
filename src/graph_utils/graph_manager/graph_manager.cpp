@@ -72,6 +72,17 @@ bool GraphManager::hasEdge(GraphData& graph_data, int out_node, int in_node)
 {
 	return graph_data.out_edges_by_node[out_node].find(in_node) != graph_data.out_edges_by_node[out_node].end();
 }
+
+void GraphManager::findLongestCycles(GraphData& graph_data)
+{
+	throw new std::runtime_error("Method not implemented.");
+
+	std::vector<std::vector<int>> longest_cycles;
+
+	// TODO: actually compute those cycles
+
+	graph_data.assignLongestCycles(longest_cycles);
+}
 #pragma endregion
 
 #pragma region longestCycles
@@ -148,17 +159,6 @@ void GraphManager::transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& gra
 		}
 
 	} while (any_edge_removed);
-}
-
-void GraphManager::findLongestCycles(GraphData& graph_data)
-{
-	throw new std::runtime_error("Method not implemented.");
-
-	std::vector<std::vector<int>> longest_cycles;
-
-	// TODO: actually compute those cycles
-
-	graph_data.assignLongestCycles(longest_cycles);
 }
 #pragma endregion
 
