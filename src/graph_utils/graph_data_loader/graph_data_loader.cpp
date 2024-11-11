@@ -3,9 +3,7 @@
 void GraphsDataLoader::loadGraphData(InputManager& input_manager, GraphData& graph_data)
 {
     if (graph_data.initialized)
-    {
         throw new std::runtime_error("GraphData already initialized.");
-    }
 
     std::string line;
     input_manager.readLine(line);
@@ -27,15 +25,15 @@ void GraphsDataLoader::loadGraphData(InputManager& input_manager, GraphData& gra
             stream >> value;
             //graph_data(row, col) = value;
 
-            if (value)
-            {
-                graph_data.out_edges_by_node[row].insert(col);
-                graph_data.in_edges_by_node[col].insert(row);
+            if (!value)
+                continue;
+            
+            graph_data.out_edges_by_node[row].insert(col);
+            graph_data.in_edges_by_node[col].insert(row);
 
-                // TO CONSIDER: if you know that node x has 0 out_edges it means that x is a leaf node for any in_edges. 
-                // this fact later means that those in_edges are useless and you can get stop adding them in result, because they can't belong to any cycle.
-                // (those edges are only useless in terms of looking for longest cycle task)
-            }
+            // TO CONSIDER: if you know that node x has 0 out_edges it means that x is a leaf node for any in_edges. 
+            // this fact later means that those in_edges are useless and you can get stop adding them in result, because they can't belong to any cycle.
+            // (those edges are only useless in terms of looking for longest cycle task)
         }
     }
 }
@@ -54,10 +52,10 @@ void GraphsDataLoader::loadGraphsFromFileData(std::vector<GraphData>& graphs_dat
         loadGraphData(input_manager, graph_data);
         graphs_data.push_back(graph_data);
 
-        if (i != graphs_data_count - 1)
-        {
-            input_manager.readLine(line); // get rid of empty line between graphs
-        }
+        if (i == graphs_data_count - 1)
+            continue;
+
+        input_manager.readLine(line); // get rid of empty line between graphs
     }
 
     input_manager.closeFile();

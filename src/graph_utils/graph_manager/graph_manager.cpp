@@ -73,19 +73,6 @@ bool GraphManager::hasEdge(GraphData& graph_data, int out_node, int in_node)
 	return graph_data.out_edges_by_node[out_node].find(in_node) != graph_data.out_edges_by_node[out_node].end();
 }
 
-void GraphManager::findLongestCycles(GraphData& graph_data)
-{
-	throw new std::runtime_error("Method not implemented.");
-
-	std::vector<std::vector<int>> longest_cycles;
-
-	// TODO: actually compute those cycles
-
-	graph_data.assignLongestCycles(longest_cycles);
-}
-#pragma endregion
-
-#pragma region longestCycles
 void GraphManager::transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& graph_data)
 {
 	bool any_edge_removed;
@@ -103,18 +90,18 @@ void GraphManager::transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& gra
 			int in_node = in_pair.first;
 			const std::unordered_set<int>& in_edges = in_pair.second;
 
-			if (isNodeWithoutOutEdges(graph_data, in_node))
+			if (!isNodeWithoutOutEdges(graph_data, in_node))
+				continue;
+
+			for each (int out_node in in_edges)
 			{
-				for each (int out_node in in_edges)
-				{
-					graph_data.out_edges_by_node[out_node].erase(in_node);
+				graph_data.out_edges_by_node[out_node].erase(in_node);
 
-					if (graph_data.out_edges_by_node[out_node].empty())
-						graph_data.out_edges_by_node.erase(out_node);
-				}
-
-				nodes_to_remove_in_edges.push_back(in_node);
+				if (graph_data.out_edges_by_node[out_node].empty())
+					graph_data.out_edges_by_node.erase(out_node);
 			}
+
+			nodes_to_remove_in_edges.push_back(in_node);
 		}
 
 		for each (int in_node in nodes_to_remove_in_edges)
@@ -133,18 +120,18 @@ void GraphManager::transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& gra
 			int out_node = out_pair.first;
 			const std::unordered_set<int>& out_edges = out_pair.second;
 
-			if (isNodeWithoutInEdges(graph_data, out_node))
+			if (!isNodeWithoutInEdges(graph_data, out_node))
+				continue;
+			
+			for each (int in_node in out_edges)
 			{
-				for each (int in_node in out_edges)
-				{
-					graph_data.in_edges_by_node[in_node].erase(out_node);
+				graph_data.in_edges_by_node[in_node].erase(out_node);
 
-					if (graph_data.in_edges_by_node[in_node].empty())
-						graph_data.in_edges_by_node.erase(in_node);
-				}
-
-				nodes_to_remove_out_edges.push_back(out_node);
+				if (graph_data.in_edges_by_node[in_node].empty())
+					graph_data.in_edges_by_node.erase(in_node);
 			}
+
+			nodes_to_remove_out_edges.push_back(out_node);
 		}
 
 		for each (int out_node in nodes_to_remove_out_edges)
@@ -162,6 +149,19 @@ void GraphManager::transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& gra
 }
 #pragma endregion
 
+#pragma region longestCycles
+void GraphManager::findLongestCycles(GraphData& graph_data)
+{
+	throw new std::runtime_error("Method not implemented.");
+
+	std::vector<std::vector<int>> longest_cycles;
+
+	// TODO: actually compute those cycles
+
+	graph_data.assignLongestCycles(longest_cycles);
+}
+#pragma endregion
+
 #pragma region hamiltonCycleApproximation
 bool GraphManager::tryGetRandomUnvisitedNeighbourNode(GraphData& graph_data, int node, std::unordered_set<int>& visited_nodes, int& random_neighbour_node)
 {
@@ -175,22 +175,24 @@ bool GraphManager::tryGetUnvisitedNodeWithLeastInEdges(GraphData& graph_data, st
 	int least_in_edges = INT_MAX;
 
 	for (int node = 0; node < graph_data.getNodesCount(); ++node)
-		if (visited_nodes.find(node) == visited_nodes.end())
+	{
+		if (visited_nodes.find(node) != visited_nodes.end())
+			continue;
+
+		const auto& in_edges = graph_data.in_edges_by_node.find(node);
+
+		if (in_edges == graph_data.in_edges_by_node.end())
 		{
-			const auto& in_edges = graph_data.in_edges_by_node.find(node);
-
-			if (in_edges == graph_data.in_edges_by_node.end())
-			{
-				node_with_least_in_edges = node;
-				return true;
-			}
-
-			if (in_edges->second.size() < least_in_edges)
-			{
-				least_in_edges = in_edges->second.size();
-				node_with_least_in_edges = node;
-			}
+			node_with_least_in_edges = node;
+			return true;
 		}
+
+		if (in_edges->second.size() < least_in_edges)
+		{
+			least_in_edges = in_edges->second.size();
+			node_with_least_in_edges = node;
+		}
+	}
 
 	if (least_in_edges == INT_MAX)
 	{
@@ -223,14 +225,14 @@ bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data
 		rotateCycleToStartFromTheSmallestIndex(rec_data.followed_path);
 
 		int current_extention_size = graph_data.getHamiltonCycleGraphExtentionSize();
-		if (rec_data.graph_extention.size() < current_extention_size || current_extention_size == -1)
-		{
-			graph_data.setHamiltonCycleGraphExtention(rec_data.graph_extention);
-			graph_data.addHamiltonCycle(rec_data.followed_path);
+		if (rec_data.graph_extention.size() >= current_extention_size && current_extention_size != -1)
+			continue;
 
-			if (graph_data.getHamiltonCycleGraphExtention().empty())
-				break;
-		}
+		graph_data.setHamiltonCycleGraphExtention(rec_data.graph_extention);
+		graph_data.addHamiltonCycle(rec_data.followed_path);
+
+		if (graph_data.getHamiltonCycleGraphExtention().empty())
+			break;
 	}
 
 	GraphData extended_graph_data = graph_data;
@@ -277,10 +279,8 @@ void GraphManager::followRandomPathRec(FollowRandomPathRecData& rec_data, int cu
 		if (!allow_extending)
 		{
 			if (!has_edge_to_start_node || rec_data.followed_path.size() != rec_data.graph_data.getNodesCount())
-			{
 				rec_data.followed_path = {};
-				return;
-			}
+			return;
 		}
 
 		//if (!tryGetRandomUnvisitedNode(rec_data.graph_data.getNodesCount(), rec_data.visited_nodes, next_node)) // for speedup, but might be less accurate

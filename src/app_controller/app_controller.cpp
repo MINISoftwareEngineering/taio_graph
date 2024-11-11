@@ -4,9 +4,7 @@ void AppController::run(RunData& data)
 {
     console_manager.clear();
     if (input_manager.inputFileExists())
-	{
 		console_manager.write("Input files detected\n");
-	}
 	else
 	{
 		console_manager.write("Create " INPUT_FOLDER_PATH " files\n");
