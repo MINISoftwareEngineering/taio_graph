@@ -10,7 +10,9 @@ void AppController::run(RunData& data)
 	else
 	{
 		console_manager.write("Create " INPUT_FOLDER_PATH " files\n");
+		console_manager.waitForEnter();
 	}
+	
 
     console_manager.write("Loading input...\n");
     graph_data_loader.loadGraphsData(graphs_data);
@@ -18,9 +20,10 @@ void AppController::run(RunData& data)
 	console_manager.write("Finding minimum extentions with retry factor=" + std::to_string(data.hamilton.approx.retry_factor) + "...\n");
 	for (int i = 0; i < graphs_data.size(); ++i)
 		if (!graph_manager.tryFindMinimumExtentionForHamiltonCycle(graphs_data[i], data.hamilton.approx.retry_factor))
-		{
-			console_manager.write("|- Finding failed for graph " + std::to_string(i) + "! \n");
-		}
+			console_manager.write("|- graph " + std::to_string(i) + ": Finding failed! \n");
+		else
+			console_manager.write("|- graph " + std::to_string(i) + ": Finding finished! \n");
+	console_manager.clear();
 
 	console_manager.listGraphsHamiltonCycleExtentions(graphs_data);
 	console_manager.waitForEnter();

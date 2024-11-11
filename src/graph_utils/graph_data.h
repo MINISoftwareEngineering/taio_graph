@@ -85,6 +85,10 @@ public:
     {
         return hamilton_cycles;
     }
+    bool isHamiltonCycleGraphExtentionAssigned()
+    {
+        return hamilton_cycle_graph_extention_assigned;
+    }
 
 private:
     bool hamilton_cycle_graph_extention_assigned = false;

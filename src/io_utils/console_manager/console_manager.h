@@ -1,7 +1,10 @@
 #pragma once
 #include <config.h>
-#include <graph_data.h>
 #include <graph_manager/graph_manager.h>
+#include <limits>
+#include <future>
+#include <thread>
+#include <chrono>
 
 inline std::ostream& operator<<(std::ostream& os, const graph_extention_t& extention)
 {
@@ -61,9 +64,9 @@ struct ConsoleManager
 
     void waitForEnter()
     {
-        std::cout << "[Press Enter to continue]\n";
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        clear();
+            std::cout << "[Press Enter to continue] \n";
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            clear();
     }
 
     void listGraphsSizes(std::vector<GraphData>& graphs_data)
@@ -80,12 +83,18 @@ struct ConsoleManager
         for (int i = 0; i < graphs_data.size(); ++i)
         {
             GraphData& graph_data = graphs_data[i];
-            std::string hamilton_cycles_count = std::to_string(graph_data.getHamiltonCycles().size());
 
-            write("|- graph " + std::to_string(i + 1) + ": \n");
-            write("|  |- hamilton cycles: " + hamilton_cycles_count + " \n");
-            write("|  |- smallest extention: \n"); 
-            write(graph_data.getHamiltonCycleGraphExtention());
+            if (graph_data.isHamiltonCycleGraphExtentionAssigned())
+            {
+                std::string hamilton_cycles_count = std::to_string(graph_data.getHamiltonCycles().size());
+
+                write("|- graph " + std::to_string(i + 1) + ": \n");
+                write("|  |- hamilton cycles: " + hamilton_cycles_count + " \n");
+                write("|  |- smallest extention: \n");
+                write(graph_data.getHamiltonCycleGraphExtention());
+            }
+            else
+                write("|- graph " + std::to_string(i + 1) + ": Finding failed \n");
         }
     }
 
