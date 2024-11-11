@@ -44,9 +44,9 @@ Paths that have desired lenght and the last node has out-edge to start node are 
 The input data will be saved in a format common to all teams, ensuring data interchangeability between teams.
 These will be text files containing descriptions of one or more graphs, separated by an empty line.
 The first line of the file contains the number of graphs in the file. Starting from the second line, the graph descriptions are as follows:  
-- The first line of the description contains the number of vertices, recorded on a single line,  
-- The following lines contain rows of the adjacency matrix with elements separated by spaces,  
-- After the adjacency matrix, additional data may be recorded in subsequent lines of the file.
+- The first line of the description contains the number of vertices, recorded on a single line.  
+- The following lines contain rows of the adjacency matrix with elements separated by spaces.
+- Its recommended to put only 1 graph in 1 file for guaranteed interchangeability between teams.
   
 The adjacency matrix records the number of edges between vertices (either 0 or 1).
 For undirected graphs, the adjacency matrix will be symmetrical along the main diagonal.
