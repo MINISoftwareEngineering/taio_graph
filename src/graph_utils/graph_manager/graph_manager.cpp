@@ -208,7 +208,7 @@ bool GraphManager::tryGetRandomUnvisitedNode(int nodes_count, std::unordered_set
 
 bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data, int retry_factor)
 {
-	int iterations = getEdgesDensityMetic(graph_data) * retry_factor;
+	int iterations = std::max(getEdgesDensityMetic(graph_data), 1) * retry_factor;
 
 	for (int i = 0; i < iterations; ++i)
 	{
@@ -239,7 +239,7 @@ bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data
 		addEdge(extended_graph_data, e);
 	}
 	
-	iterations = getGraphSize(extended_graph_data) * std::max((int)log2(retry_factor), 1);
+	iterations = getGraphSize(extended_graph_data) * std::max((int)log10(retry_factor), 1);
 	transformToGraphWithoutEdgesAdjecentToLeafNode(extended_graph_data);
 	for (int i = 0; i < iterations; ++i)
 	{
