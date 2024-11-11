@@ -3,6 +3,41 @@
 #include <graph_data.h>
 #include <graph_manager/graph_manager.h>
 
+inline std::ostream& operator<<(std::ostream& os, const graph_extention_t& extention)
+{
+    if (extention.empty())
+    {
+        os << "|  |   [] \n";
+        return os;
+    }
+
+    int i = 0;
+    os << "|  |   [ ";
+    for each (edge e in extention)
+    {
+        if (i % 6 == 0)
+            os << "\n|  |     ";
+        os << e.in << " -> " << e.out;
+        if (i++ != extention.size() - 1)
+            os << ", ";
+    }
+    os << "\n|  |   ] \n";
+    return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const path_t& path)
+{
+    os << "[ ";
+    for (size_t i = 0; i < path.size(); ++i)
+    {
+        os << path[i];
+        if (i != path.size() - 1)
+            os << " -> ";
+    }
+    os << " ]";
+    return os;
+}
+
 struct ConsoleManager
 {
     void clear()
@@ -49,7 +84,8 @@ struct ConsoleManager
 
             write("|- graph " + std::to_string(i + 1) + ": \n");
             write("|  |- hamilton cycles: " + hamilton_cycles_count + " \n");
-            write("|  |- smallest extention: "); write(graph_data.getHamiltonCycleGraphExtention()); write(" \n");
+            write("|  |- smallest extention: \n"); 
+            write(graph_data.getHamiltonCycleGraphExtention());
 
             //write("|- graph " + std::to_string(i + 1) + ": { hamilton cycles: " + hamilton_cycles_count + ", extention: ");
             //std::cout << graph_data.getHamiltonCycleGraphExtention();
@@ -60,3 +96,4 @@ struct ConsoleManager
 private:
     GraphManager graph_manager;
 };
+

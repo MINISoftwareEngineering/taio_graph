@@ -39,39 +39,6 @@ struct edge
 typedef std::set<edge> graph_extention_t;
 typedef std::vector<int> path_t;
 
-inline std::ostream& operator<<(std::ostream& os, const graph_extention_t& extention)
-{
-    os << "[ ";
-
-    int i = 0;
-    for each (edge e in extention)
-    {
-        os << e.in;
-        os << " -> ";
-        os << e.out;
-        if (i != extention.size() - 1)
-            os << ", ";
-
-        ++i;
-    }
-
-    os << " ]";
-    return os;
-}
-inline std::ostream& operator<<(std::ostream& os, const path_t& path) 
-{
-    os << "[ ";
-    for (size_t i = 0; i < path.size(); ++i)
-    {
-        os << path[i];
-        if (i != path.size() - 1) 
-            os << " -> ";
-    }
-    os << " ]";
-    return os;
-}
-
-
 #define INPUT_FOLDER_PATH RESOURCES_PATH "input"
 
 #define PROJECT_ERROR(message) \
