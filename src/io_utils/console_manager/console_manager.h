@@ -102,7 +102,7 @@ struct ConsoleManager
     {
         write("Metric distance between graphs " 
             + std::to_string(graph_data_1.getId()) + " and " + std::to_string(graph_data_2.getId()) + ": " 
-            + std::to_string(graph_manager.getExactMetricDistance(graph_data_1, graph_data_2)) + " \n");
+            + std::to_string(graph_manager.getMetricDistance(graph_data_1, graph_data_2)) + " \n");
     }
 
 private:

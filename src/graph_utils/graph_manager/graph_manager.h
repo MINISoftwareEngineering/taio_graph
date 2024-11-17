@@ -53,7 +53,7 @@ private:
 
 #pragma region metric
 public:
-	int getExactMetricDistance(GraphData graph_1, GraphData graph_2);
+	int getMetricDistance(GraphData graph_1, GraphData graph_2);
 #pragma endregion
 
 #pragma region metricApproximation
