@@ -55,8 +55,8 @@ void GraphManager::removeInEdges(GraphData& graph_data, int node)
 
 void GraphManager::addEdge(GraphData& graph_data, edge new_edge)
 {
-	graph_data.in_edges_by_node[new_edge.out].insert(new_edge.in);
-	graph_data.out_edges_by_node[new_edge.in].insert(new_edge.out);
+	graph_data.in_edges_by_node[new_edge.end].insert(new_edge.start);
+	graph_data.out_edges_by_node[new_edge.start].insert(new_edge.end);
 }
 
 int GraphManager::getEdgesDensity(GraphData& graph_data)
@@ -75,9 +75,11 @@ int GraphManager::getEdgesDensity(GraphData& graph_data)
 	return metric;
 }
 
-bool GraphManager::hasEdge(GraphData& graph_data, int out_node, int in_node)
+bool GraphManager::hasEdge(GraphData& graph_data, int start_node, int end_node)
 {
-	return graph_data.out_edges_by_node[out_node].find(in_node) != graph_data.out_edges_by_node[out_node].end();
+	if (graph_data.out_edges_by_node.count(start_node) == 0)
+		return false;
+	return graph_data.out_edges_by_node[start_node].find(end_node) != graph_data.out_edges_by_node[start_node].end();
 }
 
 void GraphManager::transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& graph_data)
@@ -254,8 +256,8 @@ bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data
 			iterations = getGraphSize(extended_graph_data) * std::max((int)log(retry_factor), 1);
 			for (int i = 0; i < iterations; ++i)
 			{
-				FollowRandomPathRecData rec_data = { e.in, extended_graph_data };
-				followRandomPathRec(rec_data, e.in, false, e.out);
+				FollowRandomPathRecData rec_data = { e.start, extended_graph_data };
+				followRandomPathRec(rec_data, e.start, false, e.end);
 
 				if (rec_data.followed_path.size() > 0)
 				{
@@ -329,5 +331,42 @@ void GraphManager::followRandomPathRec(FollowRandomPathRecData& rec_data, int cu
 	}
 
 	followRandomPathRec(rec_data, next_node, allow_extending);
+}
+#pragma endregion
+
+#pragma region metric
+int GraphManager::getMetricDistance(GraphData graph_1, GraphData graph_2)
+{
+	int distance = 0;
+	GraphData larger_graph = graph_1;
+	GraphData smaller_graph = graph_2;
+
+	if (graph_1.getNodesCount() < graph_2.getNodesCount())
+	{
+		smaller_graph = graph_1;
+		larger_graph = graph_2;
+	}
+
+	// TODO: do it for every possible smaller_graph nodes mapping to larger_graph nodes and add smallest distance
+	#pragma region addingOrRemovingEdgesCount
+	distance += larger_graph.getNodesCount() - smaller_graph.getNodesCount();
+	smaller_graph.setNodesCount(larger_graph.getNodesCount());
+
+	std::set<edge> different_edges;
+	for (int start_node = 0; start_node < smaller_graph.getNodesCount(); ++start_node)
+		for (int end_node = 0; end_node < smaller_graph.getNodesCount(); ++end_node)
+		{
+			int edge_count = 0;
+			if (hasEdge(smaller_graph, start_node, end_node))
+				++edge_count;
+			if (hasEdge(larger_graph, start_node, end_node))
+				++edge_count;
+			if (edge_count == 1)
+				different_edges.insert({ start_node, end_node });
+		}
+	distance += different_edges.size();
+	#pragma endregion
+
+	return distance;
 }
 #pragma endregion

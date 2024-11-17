@@ -17,12 +17,18 @@ private:
 	void removeOutEdges(GraphData& graph_data, int node);
 	void removeInEdges(GraphData& graph_data, int node);
 	bool tryGetRandomNode(int nodes_count, int& random_node);
-	bool hasEdge(GraphData& graph_data, int out_node, int in_node);
+	bool hasEdge(GraphData& graph_data, int start_node, int end_node);
 #pragma endregion
 
 #pragma region longestCycles
 public:
 	void findLongestCycles(GraphData& graph_data);
+#pragma endregion
+
+#pragma region longestCyclesApproximation
+#pragma endregion
+
+#pragma region hamiltonCycle
 #pragma endregion
 
 #pragma region hamiltonCycleApproximation
@@ -43,5 +49,13 @@ private:
 	bool tryGetRandomUnvisitedNeighbourNode(GraphData& graph_data, int node, std::unordered_set<int>& visited_nodes, int& random_neighbour_node);
 	bool tryGetUnvisitedNodeWithLeastInEdges(GraphData& graph_data, std::unordered_set<int>& visited_nodes, int& random_unvisited_node);
 	void followRandomPathRec(FollowRandomPathRecData& rec_data, int current_node, bool allow_extending = true, int forced_next_node = -1);
+#pragma endregion
+
+#pragma region metric
+public:
+	int getExactMetricDistance(GraphData graph_1, GraphData graph_2);
+#pragma endregion
+
+#pragma region metricApproximation
 #pragma endregion
 };

@@ -10,10 +10,12 @@ void AppController::run(RunData& data)
 		console_manager.write("Create " INPUT_FOLDER_PATH " files\n");
 		console_manager.waitForEnter();
 	}
-	
 
     console_manager.write("Loading input...\n");
     graph_data_loader.loadGraphsData(graphs_data);
+
+	console_manager.writeDistanceBetweenGraphs(graphs_data[0], graphs_data[1]);
+	console_manager.waitForEnter();
 
 	console_manager.write("Finding minimum extentions with retry factor=" + std::to_string(data.hamilton.approx.retry_factor) + "...\n");
 	for (int i = 0; i < graphs_data.size(); ++i)

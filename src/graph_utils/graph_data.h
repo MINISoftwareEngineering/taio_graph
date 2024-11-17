@@ -14,6 +14,14 @@ public:
             throw new std::runtime_error("GraphData not initialized.");
         return nodes_count;
     }
+
+    void setNodesCount(int new_nodes_count)
+    {
+        if (new_nodes_count < 0)
+            throw new std::runtime_error("Invalid nodes count number.");
+        nodes_count = new_nodes_count;
+    }
+
     //std::vector<bool>::reference operator ()(size_t row_idx, size_t col_idx)
     //{
     //    if (!initialized) 
@@ -26,9 +34,17 @@ public:
     //    return relation_matrix[row_idx][col_idx];
     //}
 
+    int getId()
+    {
+        if (!initialized)
+            throw new std::runtime_error("Graph not initialized");
+        return id;
+    }
+
 private:
     bool initialized = false;
     int nodes_count;
+    int id = -1;
     //std::vector<std::vector<bool>> relation_matrix; // TO CONSIDER: remove it and leave only out/in_edges_by_node
 #pragma endregion
 

@@ -11,5 +11,5 @@ private:
     InputManager input_manager;
 
     void loadGraphData(InputManager& input_manager, GraphData& graph_data);
-    void loadGraphsFromFileData(std::vector<GraphData>& graphs_data, std::string input_path);
+    void loadGraphsFromFileData(std::vector<GraphData>& graphs_data, std::string input_path, int& id_offset);
 };

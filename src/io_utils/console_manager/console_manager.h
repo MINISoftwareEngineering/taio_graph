@@ -20,7 +20,7 @@ inline std::ostream& operator<<(std::ostream& os, const graph_extention_t& exten
     {
         if (i % 6 == 0)
             os << "\n|  |     ";
-        os << e.in << " -> " << e.out;
+        os << e.start << " -> " << e.end;
         if (i++ != extention.size() - 1)
             os << ", ";
     }
@@ -96,6 +96,13 @@ struct ConsoleManager
             else
                 write("|- graph " + std::to_string(i + 1) + ": Finding failed \n");
         }
+    }
+
+    void writeDistanceBetweenGraphs(GraphData& graph_data_1, GraphData& graph_data_2)
+    {
+        write("Metric distance between graphs " 
+            + std::to_string(graph_data_1.getId()) + " and " + std::to_string(graph_data_2.getId()) + ": " 
+            + std::to_string(graph_manager.getExactMetricDistance(graph_data_1, graph_data_2)) + " \n");
     }
 
 private:

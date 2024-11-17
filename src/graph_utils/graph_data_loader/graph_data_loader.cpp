@@ -38,7 +38,7 @@ void GraphsDataLoader::loadGraphData(InputManager& input_manager, GraphData& gra
     }
 }
 
-void GraphsDataLoader::loadGraphsFromFileData(std::vector<GraphData>& graphs_data, std::string input_path)
+void GraphsDataLoader::loadGraphsFromFileData(std::vector<GraphData>& graphs_data, std::string input_path, int& id_offset)
 {
     input_manager.openFile(input_path);
 
@@ -49,6 +49,7 @@ void GraphsDataLoader::loadGraphsFromFileData(std::vector<GraphData>& graphs_dat
     for (int i = 0; i < graphs_data_count; ++i)
     {
         GraphData graph_data;
+        graph_data.id = i + id_offset;
         loadGraphData(input_manager, graph_data);
         graphs_data.push_back(graph_data);
 
@@ -57,6 +58,7 @@ void GraphsDataLoader::loadGraphsFromFileData(std::vector<GraphData>& graphs_dat
 
         input_manager.readLine(line); // get rid of empty line between graphs
     }
+    id_offset += graphs_data_count;
 
     input_manager.closeFile();
 }
@@ -66,6 +68,7 @@ void GraphsDataLoader::loadGraphsData(std::vector<GraphData>& graphs_data)
     std::vector<std::string> input_paths;
     input_manager.loadInputPaths(input_paths);
 
+    int id_offset = 0;
     for (const std::string& input_path : input_paths)
-        loadGraphsFromFileData(graphs_data, input_path);
+        loadGraphsFromFileData(graphs_data, input_path, id_offset);
 }

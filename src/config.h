@@ -24,16 +24,16 @@ typedef unsigned short ushort;
 typedef unsigned char uchar;
 struct edge
 {
-    int in, out;
+    int start, end;
 
     bool operator==(const edge& other) const 
     {
-        return in == other.in && out == other.out;
+        return start == other.start && end == other.end;
     }
 
     bool operator<(const edge& other) const 
     {
-        return (in < other.in) || (in == other.in && out < other.out);
+        return (start < other.start) || (start == other.start && end < other.end);
     }
 };
 typedef std::set<edge> graph_extention_t;
