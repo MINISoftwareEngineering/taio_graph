@@ -247,7 +247,6 @@ bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data
 	GraphData extended_graph_data = graph_data;
 	for each (edge e in graph_data.getHamiltonCycleGraphExtention())
 		addEdge(extended_graph_data, e);
-	transformToGraphWithoutEdgesAdjecentToLeafNode(extended_graph_data);
 
 	if (!graph_data.getHamiltonCycleGraphExtention().empty())
 	{
