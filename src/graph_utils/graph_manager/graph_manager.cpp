@@ -1,4 +1,5 @@
 #include "graph_manager.h"
+#include <functional>
 
 #pragma region general
 int GraphManager::getGraphSize(GraphData& graph_data)
@@ -156,6 +157,55 @@ void GraphManager::transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& gra
 
 	} while (any_edge_removed);
 }
+
+/// <summary>
+/// void generateGraphPermutations(GraphData& graph_data, std::function<bool(GraphData)> callback)
+/// </summary>
+/// <param name="graph_data">
+///		graph for which we perform the permutations
+/// </param>
+/// <param name="callback">
+///		a callback function that returns true if we want to continue with the permutations or false if we want to end,
+///		this allows us to perform operations on permuted graphs one by one instead of having to hold them all in memory
+/// </param>
+void GraphManager::generateGraphPermutations(GraphData& graph_data, std::function<bool(GraphData)> callback) 
+{
+	std::vector<int> nodes;
+	for (const auto& pair : graph_data.out_edges_by_node) {
+		nodes.push_back(pair.first);
+	}
+
+	std::sort(nodes.begin(), nodes.end());
+
+	do {
+		GraphData permuted_graph;
+		std::unordered_map<int, int> nodes_mapping;
+		for (int i = 0; i < nodes.size(); i++) {
+			nodes_mapping[nodes[i]] = i;
+		}
+
+		for (const auto& [node, edges] : graph_data.out_edges_by_node) {
+			int permuted_node_index = nodes_mapping[node];
+			for (int edge : edges) {
+				permuted_graph.out_edges_by_node[permuted_node_index].insert(nodes_mapping[edge]);
+			}
+		}
+
+		for (const auto& [node, edges] : graph_data.in_edges_by_node) {
+			int permuted_node_index = nodes_mapping[node];
+			for (int edge : edges) {
+				permuted_graph.in_edges_by_node[permuted_node_index].insert(nodes_mapping[edge]);
+			}
+		}
+
+		if (!callback(permuted_graph)) {
+			break;
+		}
+
+
+	} while (std::next_permutation(nodes.begin(), nodes.end()));
+}
+
 #pragma endregion
 
 #pragma region longestCycles
