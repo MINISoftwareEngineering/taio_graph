@@ -198,6 +198,9 @@ void GraphManager::generateGraphPermutations(GraphData& graph_data, std::functio
 			}
 		}
 
+		permuted_graph.setNodesCount(graph_data.getNodesCount());
+		permuted_graph.setInitialize(true);
+
 		if (!callback(permuted_graph)) {
 			break;
 		}
