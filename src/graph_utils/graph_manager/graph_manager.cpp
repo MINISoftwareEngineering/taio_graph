@@ -399,22 +399,40 @@ int GraphManager::getMetricDistance(GraphData graph_1, GraphData graph_2)
 
 	// TODO: do it for every possible smaller_graph nodes mapping to larger_graph nodes and add smallest distance
 	#pragma region addingOrRemovingEdgesCount
-	distance += larger_graph.getNodesCount() - smaller_graph.getNodesCount();
+	int size_difference = larger_graph.getNodesCount() - smaller_graph.getNodesCount();
+	distance += size_difference;
 	smaller_graph.setNodesCount(larger_graph.getNodesCount());
 
-	std::set<edge> different_edges;
-	for (int start_node = 0; start_node < smaller_graph.getNodesCount(); ++start_node)
-		for (int end_node = 0; end_node < smaller_graph.getNodesCount(); ++end_node)
-		{
-			int edge_count = 0;
-			if (hasEdge(smaller_graph, start_node, end_node))
-				++edge_count;
-			if (hasEdge(larger_graph, start_node, end_node))
-				++edge_count;
-			if (edge_count == 1)
-				different_edges.insert({ start_node, end_node });
-		}
-	distance += different_edges.size();
+	generateGraphPermutations(smaller_graph, [&distance, this, size_difference](GraphData permutedGraph) {
+			
+			int current_distance = size_difference;
+			std::set<edge> different_edges;
+			for (int start_node = 0; start_node < permutedGraph.getNodesCount(); ++start_node) {
+				for (int end_node = 0; end_node < permutedGraph.getNodesCount(); ++end_node)
+				{
+					int edge_count = 0;
+					if (hasEdge(permutedGraph, start_node, end_node))
+						++edge_count;
+					if (hasEdge(permutedGraph, start_node, end_node))
+						++edge_count;
+					if (edge_count == 1)
+						different_edges.insert({ start_node, end_node });
+
+				}
+			}
+
+			current_distance += different_edges.size();
+
+			if (current_distance < distance) {
+				distance = current_distance;
+			}
+
+			if (distance == 0)
+				return false;
+
+			return true;
+		});
+
 	#pragma endregion
 
 	return distance;
