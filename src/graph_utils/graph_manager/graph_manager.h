@@ -1,6 +1,7 @@
 #pragma once
 #include <config.h>
 #include <graph_data.h>
+#include <functional>
 
 struct GraphManager
 {
@@ -18,6 +19,8 @@ private:
 	void removeInEdges(GraphData& graph_data, int node);
 	bool tryGetRandomNode(int nodes_count, int& random_node);
 	bool hasEdge(GraphData& graph_data, int start_node, int end_node);
+public:
+	void generateGraphPermutations(GraphData& graph_data, std::function<bool(GraphData)> callback);
 #pragma endregion
 
 #pragma region longestCycles
