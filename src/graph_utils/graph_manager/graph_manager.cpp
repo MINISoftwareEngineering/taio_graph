@@ -223,8 +223,6 @@ bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data
 
 	for (int i = 0; i < iterations; ++i)
 	{
-		//std::cout << std::to_string(i) + " try: \n";
-
 		int start_node;
 		if (!tryGetRandomNode(graph_data.getNodesCount(), start_node))
 			return false;
@@ -244,15 +242,21 @@ bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data
 			break;
 	}
 
+	return true;
+}
+
+bool GraphManager::findAllHamiltonCycles(GraphData& graph_data, int retry_factor)
+{
 	GraphData extended_graph_data = graph_data;
 	for each (edge e in graph_data.getHamiltonCycleGraphExtention())
 		addEdge(extended_graph_data, e);
+	int graphSize = getGraphSize(extended_graph_data);
 
 	if (!graph_data.getHamiltonCycleGraphExtention().empty())
 	{
 		for each (edge e in graph_data.getHamiltonCycleGraphExtention())
 		{
-			iterations = getGraphSize(extended_graph_data) * std::max((int)log(retry_factor), 1);
+			int iterations = graphSize * std::max((int)log(retry_factor), 1);
 			for (int i = 0; i < iterations; ++i)
 			{
 				FollowRandomPathRecData rec_data = { e.start, extended_graph_data };
@@ -269,7 +273,7 @@ bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data
 		return true;
 	}
 
-	iterations = getGraphSize(extended_graph_data) * std::max((int)log(retry_factor), 1);
+	int iterations = graphSize * std::max((int)log(retry_factor), 1);
 	for (int i = 0; i < iterations; ++i)
 	{
 		FollowRandomPathRecData rec_data = { 0, extended_graph_data };
@@ -280,6 +284,23 @@ bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data
 	}
 
 	return true;
+}
+
+bool GraphManager::tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(GraphData& graph_data, int retry_factor)
+{
+	bool result = measure_execution_time(
+		graph_data.findMinimumExtentionForHamiltonCycleExecutionTimeMs, 
+		[&]() { return tryFindMinimumExtentionForHamiltonCycle(graph_data, retry_factor); }
+	);
+
+	if (!result) return false;
+
+	result = measure_execution_time(
+		graph_data.findAllHamiltonCyclesExecutionTimeMs,
+		[&]() { return findAllHamiltonCycles(graph_data, retry_factor); }
+	);
+
+	return result;
 }
 
 void GraphManager::rotateCycleToStartFromTheSmallestIndex(path_t& cycle)

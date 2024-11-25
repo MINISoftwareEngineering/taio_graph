@@ -18,6 +18,7 @@
 #include <iterator>
 #include <iomanip>
 #include <math.h>
+#include <functional>
 
 typedef unsigned int uint;
 typedef unsigned short ushort;
@@ -46,6 +47,21 @@ typedef std::vector<int> path_t;
         std::cerr << "Error at line " << __LINE__ << " in file " << MODELS_PATH << __FILE__ << ": " << message << std::endl; \
 		assert(0);																					  \
     }
+
+template <typename Func>
+auto measure_execution_time(int& measured_time_ms, Func&& func) {
+    auto start = std::chrono::high_resolution_clock::now();
+
+    auto result = std::forward<Func>(func)();
+
+    auto end = std::chrono::high_resolution_clock::now();
+
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+    measured_time_ms = duration.count();
+
+    return result;
+}
 
 // G = (V, E)
 // |V| = n, |E| = m

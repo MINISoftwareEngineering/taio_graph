@@ -33,7 +33,7 @@ public:
 
 #pragma region hamiltonCycleApproximation
 public:
-	bool tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data, int retry_factor = 1);
+	bool tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(GraphData& graph_data, int retry_factor = 1);
 
 private:
 	struct FollowRandomPathRecData
@@ -49,6 +49,8 @@ private:
 	bool tryGetRandomUnvisitedNeighbourNode(GraphData& graph_data, int node, std::unordered_set<int>& visited_nodes, int& random_neighbour_node);
 	bool tryGetUnvisitedNodeWithLeastInEdges(GraphData& graph_data, std::unordered_set<int>& visited_nodes, int& random_unvisited_node);
 	void followRandomPathRec(FollowRandomPathRecData& rec_data, int current_node, bool allow_extending = true, int forced_next_node = -1);
+	bool tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data, int retry_factor);
+	bool findAllHamiltonCycles(GraphData& graph_data, int retry_factor);
 #pragma endregion
 
 #pragma region metric

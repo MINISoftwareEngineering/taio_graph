@@ -105,6 +105,8 @@ public:
     {
         return hamilton_cycle_graph_extention_assigned;
     }
+    int findMinimumExtentionForHamiltonCycleExecutionTimeMs = -1;
+    int findAllHamiltonCyclesExecutionTimeMs = -1;
 
 private:
     bool hamilton_cycle_graph_extention_assigned = false;
