@@ -41,6 +41,11 @@ public:
         return id;
     }
 
+    void setInitialize(bool initializeState) 
+    {
+        initialized = initializeState;
+    }
+
 private:
     bool initialized = false;
     int nodes_count;
