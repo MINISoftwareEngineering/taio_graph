@@ -56,7 +56,10 @@ void GraphsDataLoader::loadGraphsFromFileData(std::vector<GraphData>& graphs_dat
         if (i == graphs_data_count - 1)
             continue;
 
-        input_manager.readLine(line); // get rid of empty line between graphs
+        do 
+        {
+            input_manager.readLine(line); // get rid of empty line between graphs
+        } while (!line.empty() && !std::all_of(line.begin(), line.end(), [](unsigned char c) { return std::isspace(c); }));
     }
     id_offset += graphs_data_count;
 

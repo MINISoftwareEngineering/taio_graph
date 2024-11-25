@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <math.h>
 #include <functional>
+#include <cctype>
 
 typedef unsigned int uint;
 typedef unsigned short ushort;
