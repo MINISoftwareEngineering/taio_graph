@@ -119,5 +119,6 @@ private:
     std::set<path_t> hamilton_cycles;
 #pragma endregion
 
+
     friend struct GraphsDataLoader;
 };

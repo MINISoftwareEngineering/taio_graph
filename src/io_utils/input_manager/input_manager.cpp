@@ -64,3 +64,28 @@ void InputManager::loadInputPaths(std::vector<std::string>& input_paths)
             input_paths.push_back(entry.path().string());
     }
 }
+
+int InputManager::readNumber()
+{
+    int x = 0;
+    while (true)
+    {
+        std::cin >> x;
+        if (!std::cin.fail()) {
+            break;
+        }
+        else {
+            std::cout << "Bad entry. Enter a NUMBER: " << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+    }
+
+    return x;
+}
+
+std::string InputManager::readLineFromStdin() {
+    std::string line;
+    std::getline(std::cin, line); // Read the entire line from stdin
+    return line;
+}

@@ -14,7 +14,31 @@ void AppController::run(RunData& data)
     console_manager.write("Loading input...\n");
     graph_data_loader.loadGraphsData(graphs_data);
 
-	console_manager.writeDistanceBetweenGraphs(graphs_data[0], graphs_data[1]);
+
+	std::string line = "R";
+	int index1 = 0;
+	int index2 = 1;
+	while (line == "R") {
+		console_manager.write("Select graph indices for metric calculations\n");
+		index1 = input_manager.readNumber();
+		index2 = input_manager.readNumber();
+		console_manager.waitForEnter();
+		console_manager.writeDistanceBetweenGraphs(graphs_data, index1, index2);
+		console_manager.write("enter R to calculate metric again for new indices\n");
+		line = input_manager.readLineFromStdin();
+	}
+	console_manager.waitForEnter();
+
+	line = "R";
+	while (line == "R") {
+		console_manager.write("Select graph indices for approximate metric calculations\n");
+		index1 = input_manager.readNumber();
+		index2 = input_manager.readNumber();
+		console_manager.waitForEnter();
+		console_manager.writeApproximateDistanceBetweenGraph(graphs_data, index1, index2);
+		console_manager.write("enter R to calculate approximate metric again for new indices\n");
+		line = input_manager.readLineFromStdin();
+	}
 	console_manager.waitForEnter();
 
 	console_manager.write("Finding minimum extentions with retry factor=" + std::to_string(data.hamilton.approx.retry_factor) + "...\n");

@@ -8,7 +8,6 @@ struct GraphManager
 #pragma region general
 public:
 	int getGraphSize(GraphData& graph_data);
-
 private:
 	int getEdgesDensity(GraphData& graph_data);
 	void transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& graph_data);
@@ -59,8 +58,13 @@ private:
 #pragma region metric
 public:
 	int getMetricDistance(GraphData graph_1, GraphData graph_2);
+private:
+	int getEditDistance(GraphData graph_1, GraphData graph_2, int size_difference);
 #pragma endregion
 
 #pragma region metricApproximation
+public:
+	int tryGetMetricDistance(GraphData graph_1, GraphData graph_2);
+	void sortGraph(GraphData& graph);
 #pragma endregion
 };

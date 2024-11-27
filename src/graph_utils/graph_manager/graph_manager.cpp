@@ -171,8 +171,9 @@ void GraphManager::transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& gra
 void GraphManager::generateGraphPermutations(GraphData& graph_data, std::function<bool(GraphData)> callback) 
 {
 	std::vector<int> nodes;
-	for (const auto& pair : graph_data.out_edges_by_node) {
-		nodes.push_back(pair.first);
+
+	for (int i = 0; i < graph_data.getNodesCount(); i++) {
+		nodes.push_back(i);
 	}
 
 	std::sort(nodes.begin(), nodes.end());
@@ -426,25 +427,9 @@ int GraphManager::getMetricDistance(GraphData graph_1, GraphData graph_2)
 	distance += size_difference;
 	smaller_graph.setNodesCount(larger_graph.getNodesCount());
 
-	generateGraphPermutations(smaller_graph, [&distance, this, size_difference](GraphData permutedGraph) {
+	generateGraphPermutations(smaller_graph, [&distance, this, size_difference, &larger_graph](GraphData permutedGraph) {
 			
-			int current_distance = size_difference;
-			std::set<edge> different_edges;
-			for (int start_node = 0; start_node < permutedGraph.getNodesCount(); ++start_node) {
-				for (int end_node = 0; end_node < permutedGraph.getNodesCount(); ++end_node)
-				{
-					int edge_count = 0;
-					if (hasEdge(permutedGraph, start_node, end_node))
-						++edge_count;
-					if (hasEdge(permutedGraph, start_node, end_node))
-						++edge_count;
-					if (edge_count == 1)
-						different_edges.insert({ start_node, end_node });
-
-				}
-			}
-
-			current_distance += different_edges.size();
+			int current_distance = getEditDistance(larger_graph, permutedGraph, size_difference);
 
 			if (current_distance < distance) {
 				distance = current_distance;
@@ -460,4 +445,91 @@ int GraphManager::getMetricDistance(GraphData graph_1, GraphData graph_2)
 
 	return distance;
 }
+
+int GraphManager::getEditDistance(GraphData graph_1, GraphData graph_2, int size_difference) {
+	GraphData larger_graph = graph_1;
+	GraphData smaller_graph = graph_2;
+
+	if (graph_1.getNodesCount() < graph_2.getNodesCount())
+	{
+		smaller_graph = graph_1;
+		larger_graph = graph_2;
+	}
+
+	int current_distance = size_difference;
+
+	std::set<edge> different_edges;
+	for (int start_node = 0; start_node < smaller_graph.getNodesCount(); ++start_node) {
+		for (int end_node = 0; end_node < smaller_graph.getNodesCount(); ++end_node)
+		{
+			int edge_count = 0;
+			if (hasEdge(smaller_graph, start_node, end_node))
+				++edge_count;
+			if (hasEdge(larger_graph, start_node, end_node))
+				++edge_count;
+			if (edge_count == 1)
+				different_edges.insert({ start_node, end_node });
+
+		}
+	}
+
+	current_distance += different_edges.size();
+	return current_distance;
+}
+#pragma endregion
+
+
+#pragma region metricApproximation
+int GraphManager::tryGetMetricDistance(GraphData graph_1, GraphData graph_2) {
+	sortGraph(graph_1);
+	sortGraph(graph_2);
+
+	GraphData larger_graph = graph_1;
+	GraphData smaller_graph = graph_2;
+
+	if (graph_1.getNodesCount() < graph_2.getNodesCount())
+	{
+		smaller_graph = graph_1;
+		larger_graph = graph_2;
+	}
+
+	int size_difference = larger_graph.getNodesCount() - smaller_graph.getNodesCount();
+	smaller_graph.setNodesCount(larger_graph.getNodesCount());
+
+	return getEditDistance(graph_1, graph_2, size_difference);
+}
+
+void GraphManager::sortGraph(GraphData& graph)
+{
+	std::vector<int> nodes;
+	for (const auto& pair : graph.out_edges_by_node)
+	{
+		nodes.push_back(pair.first);
+	}
+
+	std::stable_sort(nodes.begin(), nodes.end(), [&graph](int a, int b) {
+		size_t out_edges_a = graph.out_edges_by_node[a].size();
+		size_t out_edges_b = graph.out_edges_by_node[b].size();
+		return out_edges_a < out_edges_b;
+		});
+
+	std::stable_sort(nodes.begin(), nodes.end(), [&graph](int a, int b) {
+		size_t in_edges_a = graph.in_edges_by_node[a].size();
+		size_t in_edges_b = graph.in_edges_by_node[b].size();
+		return in_edges_a < in_edges_b;
+		});
+
+	std::unordered_map<int, std::unordered_set<int>> sorted_out_edges;
+	std::unordered_map<int, std::unordered_set<int>> sorted_in_edges;
+
+	for (int node : nodes)
+	{
+		sorted_out_edges[node] = std::move(graph.out_edges_by_node[node]);
+		sorted_in_edges[node] = std::move(graph.in_edges_by_node[node]);
+	}
+
+	graph.out_edges_by_node = std::move(sorted_out_edges);
+	graph.in_edges_by_node = std::move(sorted_in_edges);
+}
+
 #pragma endregion

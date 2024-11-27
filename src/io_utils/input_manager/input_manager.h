@@ -9,7 +9,8 @@ struct InputManager {
     void closeFile();
     bool reachedEOF();
     void loadInputPaths(std::vector<std::string>& input_paths);
-
+    int readNumber();
+    std::string readLineFromStdin();
 private:
     std::ifstream fileStream;
 };

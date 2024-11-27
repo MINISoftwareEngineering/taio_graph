@@ -102,11 +102,17 @@ struct ConsoleManager
         }
     }
 
-    void writeDistanceBetweenGraphs(GraphData& graph_data_1, GraphData& graph_data_2)
+    void writeDistanceBetweenGraphs(std::vector<GraphData> graphs, int index1, int index2)
     {
         write("Metric distance between graphs " 
-            + std::to_string(graph_data_1.getId()) + " and " + std::to_string(graph_data_2.getId()) + ": " 
-            + std::to_string(graph_manager.getMetricDistance(graph_data_1, graph_data_2)) + " \n");
+            + std::to_string(graphs[index1].getId()) + " and " + std::to_string(graphs[index2].getId()) + ": "
+            + std::to_string(graph_manager.getMetricDistance(graphs[index1], graphs[index2])) + " \n");
+    }
+
+    void writeApproximateDistanceBetweenGraph(std::vector<GraphData> graphs, int index1, int index2) {
+        write("Approximate metric distance between graphs "
+            + std::to_string(graphs[index1].getId()) + " and " + std::to_string(graphs[index2].getId()) + ": "
+            + std::to_string(graph_manager.tryGetMetricDistance(graphs[index1], graphs[index2])) + " \n");
     }
 
 private:
