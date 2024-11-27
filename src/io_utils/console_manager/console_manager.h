@@ -73,7 +73,7 @@ struct ConsoleManager
     {
         write("Graphs sizes: \n");
         for (int i = 0; i < graphs_data.size(); ++i)
-            write("|- graph " + std::to_string(i + 1) + " size: "
+            write("|- graph " + std::to_string(i) + " size: "
                 + std::to_string(graph_manager.getGraphSize(graphs_data[i])) + "\n");
     }
 
@@ -86,19 +86,31 @@ struct ConsoleManager
 
             if (graph_data.isHamiltonCycleGraphExtentionAssigned())
             {
+                int graph_size = graph_manager.getGraphSize(graph_data);
+
                 std::string hamilton_cycles_count = std::to_string(graph_data.getHamiltonCycles().size());
                 std::string full_execution_time = std::to_string(graph_data.findMinimumExtentionForHamiltonCycleExecutionTimeMs + graph_data.findAllHamiltonCyclesExecutionTimeMs);
                 std::string find_cycles_execution_time = std::to_string(graph_data.findAllHamiltonCyclesExecutionTimeMs);
                 std::string find_extention_execution_time = std::to_string(graph_data.findMinimumExtentionForHamiltonCycleExecutionTimeMs);
+                std::string efficiency = "undefined";
+                std::string efficiency_ext = "undefined";
+                std::string efficiency_cyc = "undefined";
+                if (graph_size > 0)
+                {
+                    efficiency = std::to_string(((float)graph_data.findMinimumExtentionForHamiltonCycleExecutionTimeMs + (float)graph_data.findAllHamiltonCyclesExecutionTimeMs) / (float)graph_manager.getGraphSize(graph_data));
+                    efficiency_ext = std::to_string(((float)graph_data.findMinimumExtentionForHamiltonCycleExecutionTimeMs) / (float)graph_manager.getGraphSize(graph_data));
+                    efficiency_cyc = std::to_string(((float)graph_data.findAllHamiltonCyclesExecutionTimeMs) / (float)graph_manager.getGraphSize(graph_data));
+                }
 
-                write("|- graph " + std::to_string(i + 1) + ": \n");
+                write("|- graph " + std::to_string(i) + ": \n");
                 write("|  |- finding full solution time: " + full_execution_time + " ms  (finding minumum graph: " + find_extention_execution_time + " ms, finding hamilton cycles: " + find_cycles_execution_time + " ms) \n");
+                write("|  |- efficiency: " + efficiency + ", (finding minimum graph: " + efficiency_ext + ", finding hamilton cycles: " + efficiency_cyc + ") \n");
                 write("|  |- hamilton cycles: " + hamilton_cycles_count + " \n");
                 write("|  |- smallest extention: \n");
                 write(graph_data.getHamiltonCycleGraphExtention());
             }
             else
-                write("|- graph " + std::to_string(i + 1) + ": Finding failed \n");
+                write("|- graph " + std::to_string(i) + ": Finding failed \n");
         }
     }
 

@@ -14,6 +14,18 @@ void AppController::run(RunData& data)
     console_manager.write("Loading input...\n");
     graph_data_loader.loadGraphsData(graphs_data);
 
+	console_manager.listGraphsSizes(graphs_data);
+	console_manager.waitForEnter();
+
+	console_manager.write("Finding minimum extentions with retry factor=" + std::to_string(data.hamilton.approx.retry_factor) + "...\n");
+	for (int i = 0; i < graphs_data.size(); ++i)
+		if (!graph_manager.tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(graphs_data[i], data.hamilton.approx.retry_factor))
+			console_manager.write("|- graph " + std::to_string(i) + ": Finding failed! \n");
+		else
+			console_manager.write("|- graph " + std::to_string(i) + ": Finding finished! \n");
+	console_manager.clear();
+	console_manager.listGraphsHamiltonCycleExtentions(graphs_data);
+	console_manager.waitForEnter();
 
 	std::string line = "R";
 	int index1 = 0;
@@ -39,21 +51,7 @@ void AppController::run(RunData& data)
 		console_manager.write("enter R to calculate approximate metric again for new indices\n");
 		line = input_manager.readLineFromStdin();
 	}
-	console_manager.waitForEnter();
-
-	console_manager.write("Finding minimum extentions with retry factor=" + std::to_string(data.hamilton.approx.retry_factor) + "...\n");
-	for (int i = 0; i < graphs_data.size(); ++i)
-		if (!graph_manager.tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(graphs_data[i], data.hamilton.approx.retry_factor))
-			console_manager.write("|- graph " + std::to_string(i) + ": Finding failed! \n");
-		else
-			console_manager.write("|- graph " + std::to_string(i) + ": Finding finished! \n");
-	console_manager.clear();
-
-	console_manager.listGraphsHamiltonCycleExtentions(graphs_data);
-	console_manager.waitForEnter();
-
-	console_manager.listGraphsSizes(graphs_data);
-	console_manager.waitForEnter();
+	console_manager.waitForEnter();	
 
 	console_manager.write("Finding all longest cycles...\n");
 	for (int i = 0; i < graphs_data.size(); ++i)
