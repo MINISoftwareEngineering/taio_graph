@@ -502,30 +502,32 @@ int GraphManager::tryGetMetricDistance(GraphData graph_1, GraphData graph_2) {
 void GraphManager::sortGraph(GraphData& graph)
 {
 	std::vector<int> nodes;
-	for (const auto& pair : graph.out_edges_by_node)
-	{
-		nodes.push_back(pair.first);
+	for (int i = 0; i < graph.getNodesCount(); i++) {
+		nodes.push_back(i);
 	}
+
 
 	std::stable_sort(nodes.begin(), nodes.end(), [&graph](int a, int b) {
 		size_t out_edges_a = graph.out_edges_by_node[a].size();
 		size_t out_edges_b = graph.out_edges_by_node[b].size();
-		return out_edges_a < out_edges_b;
+		return out_edges_a > out_edges_b;
 		});
 
 	std::stable_sort(nodes.begin(), nodes.end(), [&graph](int a, int b) {
 		size_t in_edges_a = graph.in_edges_by_node[a].size();
 		size_t in_edges_b = graph.in_edges_by_node[b].size();
-		return in_edges_a < in_edges_b;
+		return in_edges_a > in_edges_b;
 		});
 
 	std::unordered_map<int, std::unordered_set<int>> sorted_out_edges;
 	std::unordered_map<int, std::unordered_set<int>> sorted_in_edges;
 
+	int sorted_index = 0;
 	for (int node : nodes)
 	{
-		sorted_out_edges[node] = std::move(graph.out_edges_by_node[node]);
-		sorted_in_edges[node] = std::move(graph.in_edges_by_node[node]);
+		sorted_out_edges[sorted_index] = std::move(graph.out_edges_by_node[node]);
+		sorted_in_edges[sorted_index] = std::move(graph.in_edges_by_node[node]);
+		sorted_index++;
 	}
 
 	graph.out_edges_by_node = std::move(sorted_out_edges);
