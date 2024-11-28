@@ -1,4 +1,5 @@
 #include "app_controller.h"
+#include "output_manger/output_manager.h"
 
 void AppController::run(RunData& data)
 {
@@ -14,18 +15,10 @@ void AppController::run(RunData& data)
     console_manager.write("Loading input...\n");
     graph_data_loader.loadGraphsData(graphs_data);
 
-	console_manager.listGraphsSizes(graphs_data);
-	console_manager.waitForEnter();
+#ifdef METRIC_TESTS
+	run_metric_tests()
+#endif // METRIC_TESTS
 
-	console_manager.write("Finding minimum extentions with retry factor=" + std::to_string(data.hamilton.approx.retry_factor) + "...\n");
-	for (int i = 0; i < graphs_data.size(); ++i)
-		if (!graph_manager.tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(graphs_data[i], data.hamilton.approx.retry_factor))
-			console_manager.write("|- graph " + std::to_string(i) + ": Finding failed! \n");
-		else
-			console_manager.write("|- graph " + std::to_string(i) + ": Finding finished! \n");
-	console_manager.clear();
-	console_manager.listGraphsHamiltonCycleExtentions(graphs_data);
-	console_manager.waitForEnter();
 
 	std::string line = "R";
 	int index1 = 0;
@@ -53,8 +46,61 @@ void AppController::run(RunData& data)
 	}
 	console_manager.waitForEnter();	
 
+	console_manager.write("Finding minimum extentions with retry factor=" + std::to_string(data.hamilton.approx.retry_factor) + "...\n");
+	for (int i = 0; i < graphs_data.size(); ++i)
+		if (!graph_manager.tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(graphs_data[i], data.hamilton.approx.retry_factor))
+			console_manager.write("|- graph " + std::to_string(i) + ": Finding failed! \n");
+		else
+			console_manager.write("|- graph " + std::to_string(i) + ": Finding finished! \n");
+	console_manager.clear();
+	console_manager.listGraphsHamiltonCycleExtentions(graphs_data);
+	console_manager.waitForEnter();
+
 	console_manager.write("Finding all longest cycles...\n");
 	for (int i = 0; i < graphs_data.size(); ++i)
 		graph_manager.findLongestCycles(graphs_data[i]);
     console_manager.waitForEnter();
+}
+
+
+void AppController::run_metric_tests() {
+	int id_offset = 0;
+	graph_data_loader.loadGraphsFromFileData(metric_tests_graphs, METRIC_TESTS_INPUT_PATH, id_offset);
+
+	std::string metric_test_output = "metric_tests.csv";
+	createCSV("metric_tests.csv");
+	std::vector<std::vector<std::string>> rows = { { "Accurate Result", "Accurate Time", "Approximate Result", "Approximate Time", "Graph1 Size", "Graph 2 Size"} };
+	for (int i = 0; i < metric_tests_graphs.size(); i += 2) {
+
+		int time_of_accurate = 0;
+		int accurate = measure_execution_time(
+			time_of_accurate,
+			[&]() {
+				return graph_manager.getMetricDistance(metric_tests_graphs[i], metric_tests_graphs[i + 1]);
+			}
+		);
+
+
+		int time_of_approximate = 0;
+		int approximate = measure_execution_time(
+			time_of_approximate,
+			[&]() {
+				return graph_manager.tryGetMetricDistance(metric_tests_graphs[i], metric_tests_graphs[i + 1]);
+			}
+		);
+
+		std::vector<std::string> row = {
+			std::to_string(accurate),
+			std::to_string(time_of_accurate),
+			std::to_string(approximate),
+			std::to_string(time_of_approximate),
+			std::to_string(metric_tests_graphs[i].getNodesCount()),
+			std::to_string(metric_tests_graphs[i + 1].getNodesCount())
+		};
+
+		rows.push_back(row);
+
+	}
+
+	writeDataToCSV(metric_test_output, rows);
 }

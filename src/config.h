@@ -42,6 +42,7 @@ typedef std::set<edge> graph_extention_t;
 typedef std::vector<int> path_t;
 
 #define INPUT_FOLDER_PATH RESOURCES_PATH "input"
+#define METRIC_TESTS_INPUT_PATH INPUT_FOLDER_PATH "/metrics_tests_data/metric_tests_data.txt"
 
 #define PROJECT_ERROR(message) \
     {																									      \
