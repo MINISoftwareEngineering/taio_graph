@@ -424,7 +424,7 @@ int GraphManager::getMetricDistance(GraphData graph_1, GraphData graph_2)
 	// TODO: do it for every possible smaller_graph nodes mapping to larger_graph nodes and add smallest distance
 	#pragma region addingOrRemovingEdgesCount
 	int size_difference = larger_graph.getNodesCount() - smaller_graph.getNodesCount();
-	distance += size_difference;
+	distance = std::numeric_limits<int>::max();
 	smaller_graph.setNodesCount(larger_graph.getNodesCount());
 
 	generateGraphPermutations(smaller_graph, [&distance, this, size_difference, &larger_graph](GraphData permutedGraph) {
