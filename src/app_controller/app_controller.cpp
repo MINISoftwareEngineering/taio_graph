@@ -14,11 +14,16 @@ void AppController::run(RunData& data)
 
     console_manager.write("Loading input...\n");
     graph_data_loader.loadGraphsData(graphs_data);
+	console_manager.clear();
 
 #ifdef METRIC_TESTS
-	run_metric_tests()
-#endif // METRIC_TESTS
+	run_metric_tests();
+#endif
 
+// #define HAMILTON_TESTS
+#ifdef HAMILTON_TESTS
+	run_hamilton_tests();
+#endif
 
 	std::string line = "R";
 	int index1 = 0;
@@ -62,6 +67,51 @@ void AppController::run(RunData& data)
     console_manager.waitForEnter();
 }
 
+void AppController::run_hamilton_tests()
+{
+	int id_offset = 0;
+	graph_data_loader.loadGraphsFromFileData(hamilton_tests_graphs, HAMILTON_TESTS_INPUT_PATH, id_offset);
+
+	std::string hamilton_tests_output = "hamilton_tests.csv";
+	createCSV(hamilton_tests_output);
+	std::vector<std::vector<std::string>> rows = { { "Approximate Extention", "Approximate Extention Size" , "Approximate Cycles Count", "Approximate Extention Time", "Approximate Cycles Time", "Approximate Full Time", "Graph Size", "Vertices Count", "Retry Factor"}};
+	for (int retry_factor = 1; retry_factor <= 17; retry_factor += 4)
+	{
+		for (int i = 0; i < hamilton_tests_graphs.size(); ++i)
+		{
+			int time_of_approximate = 0;
+			int approximate = measure_execution_time(
+				time_of_approximate,
+				[&]() {
+					return graph_manager.tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(hamilton_tests_graphs[i], retry_factor);
+				}
+			);
+
+			std::stringstream extention_stream;
+			for each (auto v in hamilton_tests_graphs[i].getHamiltonCycleGraphExtention())
+			{
+				extention_stream << v.start << "->" << v.end << ", ";
+			}
+
+			std::vector<std::string> row = {
+				extention_stream.str(),
+				std::to_string(hamilton_tests_graphs[i].getHamiltonCycleGraphExtentionSize()),
+				std::to_string(hamilton_tests_graphs[i].getHamiltonCycles().size()),
+				std::to_string(hamilton_tests_graphs[i].findMinimumExtentionForHamiltonCycleExecutionTimeMs),
+				std::to_string(hamilton_tests_graphs[i].findAllHamiltonCyclesExecutionTimeMs),
+				std::to_string(time_of_approximate),
+				std::to_string(graph_manager.getGraphSize(hamilton_tests_graphs[i])),
+				std::to_string(hamilton_tests_graphs[i].getNodesCount()),
+				std::to_string(retry_factor)
+			};
+
+			rows.push_back(row);
+		}
+	}
+
+
+	writeDataToCSV(hamilton_tests_output, rows);
+}
 
 void AppController::run_metric_tests() {
 	int id_offset = 0;

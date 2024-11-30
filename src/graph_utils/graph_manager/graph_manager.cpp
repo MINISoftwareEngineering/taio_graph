@@ -347,7 +347,8 @@ bool GraphManager::tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(G
 		[&]() { return tryFindMinimumExtentionForHamiltonCycle(graph_data, retry_factor); }
 	);
 
-	if (!result) return false;
+	if (!result) 
+		return false;
 
 	result = measure_execution_time(
 		graph_data.findAllHamiltonCyclesExecutionTimeMs,

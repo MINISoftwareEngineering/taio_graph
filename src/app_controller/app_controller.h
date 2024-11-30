@@ -20,12 +20,14 @@ struct AppController
 {
     void run(RunData& data);
     void run_metric_tests();
+    void run_hamilton_tests();
+
 private:
     InputManager input_manager;
     ConsoleManager console_manager;
     GraphManager graph_manager;
     GraphsDataLoader graph_data_loader;
     std::vector<GraphData> graphs_data;
-
     std::vector<GraphData> metric_tests_graphs;
+    std::vector<GraphData> hamilton_tests_graphs;
 };
