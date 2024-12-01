@@ -20,6 +20,7 @@
 #include <math.h>
 #include <functional>
 #include <cctype>
+#include <stack>
 
 typedef unsigned int uint;
 typedef unsigned short ushort;

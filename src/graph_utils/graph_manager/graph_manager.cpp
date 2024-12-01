@@ -225,6 +225,164 @@ void GraphManager::findLongestCycles(GraphData& graph_data)
 }
 #pragma endregion
 
+#pragma region longestCyclesApproximation
+
+bool GraphManager::tryFindLongestCycles(GraphData& graph_data)
+{
+	std::vector<std::vector<int>> resulting_cycles;
+	std::stack<std::pair<int, int>> stack_of_cycles;
+
+	std::vector<int> numbers(graph_data.getNodesCount(), 0);
+	std::vector<int> parent(graph_data.getNodesCount(), -1);
+	std::vector<bool> visited(graph_data.getNodesCount(), false);
+
+	int lastLargestCycle = 0;
+
+	for (int start = 0; start < graph_data.getNodesCount(); ++start) {
+
+		std::fill(numbers.begin(), numbers.end(), 0);
+		std::fill(parent.begin(), parent.end(), -1);
+		std::fill(visited.begin(), visited.end(), false);
+
+		numbers[start] = 1;
+
+		std::stack<int> stack;
+		stack.push(start);
+
+		while (!stack.empty()) {
+			int current = stack.top();
+			stack.pop();
+
+			if (visited[current]) {
+				continue;
+			}
+
+			visited[current] = true;
+
+			std::vector<int> neighbors(graph_data.out_edges_by_node[current].begin(), graph_data.out_edges_by_node[current].end());
+
+			while (!neighbors.empty()) {
+
+				int neighbor = takeOutRandomValue(neighbors);
+
+				if (numbers[neighbor] == 0) {
+					numbers[neighbor] = numbers[current] + 1;
+					parent[neighbor] = current;
+					stack.push(neighbor);
+				}
+				else {
+					int newDifference = numbers[current] - numbers[neighbor];
+					if (newDifference > 2 && newDifference >= lastLargestCycle) {
+
+						bool isProperCycle = false;
+						int checkVert = current;
+
+						while (checkVert != -1) {
+							checkVert = parent[checkVert];
+							if (checkVert == neighbor) {
+								isProperCycle = true;
+								break;
+							}
+						}
+
+						if (newDifference > lastLargestCycle && isProperCycle) {
+							lastLargestCycle = newDifference;
+							resulting_cycles.clear();
+							while (!stack_of_cycles.empty()) stack_of_cycles.pop();
+							stack_of_cycles.push({ neighbor, current });
+						}
+						else if (isProperCycle) {
+							stack_of_cycles.push({ neighbor, current });
+						}
+					}
+				}
+			}
+		}
+
+		while (!stack_of_cycles.empty()) {
+			auto [startCycle, endCycle] = stack_of_cycles.top();
+			stack_of_cycles.pop();
+
+			std::vector<int> cycle;
+			int currentVertex = endCycle;
+			while (currentVertex != startCycle) {
+				cycle.push_back(currentVertex);
+				currentVertex = parent[currentVertex];
+			}
+			cycle.push_back(startCycle);
+			std::reverse(cycle.begin(), cycle.end());
+
+			bool isUnique = true;
+			for (int i = 0; i < resulting_cycles.size(); i++) {
+				if (isSameCycle(cycle, resulting_cycles[i])) {
+					isUnique = false;
+					break;
+				}
+			}
+
+			if (isUnique) {
+				resulting_cycles.push_back(cycle);
+			}
+		}
+	}
+	//TODO use that method somewhere
+	//graph_data.assignLongestCycles(resulting_cycles);
+	return true;
+}
+
+bool GraphManager::isSameCycle(const std::vector<int>& cycle1, const std::vector<int>& cycle2)
+{
+	if (cycle1.size() != cycle2.size()) {
+		return false;
+	}
+	int startVertex = cycle1[0];
+	int cycleSize = cycle1.size();
+
+	auto it = std::find(cycle2.begin(), cycle2.end(), startVertex);
+	if (it == cycle2.end()) {
+		return false;
+	}
+
+	int startIdxInCycle2 = std::distance(cycle2.begin(), it);
+
+	bool isSameClockwise = true;
+	bool isSameCounterClockwise = true;
+
+	for (int i = 0; i < cycleSize; ++i) {
+		if (cycle1[i] != cycle2[(startIdxInCycle2 + i) % cycleSize]) {
+			isSameClockwise = false;
+		}
+		if (cycle1[i] != cycle2[(startIdxInCycle2 - i + cycleSize) % cycleSize]) {
+			isSameCounterClockwise = false;
+		}
+		if (!isSameClockwise && !isSameCounterClockwise) {
+			return false;
+		}
+	}
+	return true;
+}
+
+int GraphManager::takeOutRandomValue(std::vector<int>& vec) {
+	if (vec.empty()) {
+		return -1;
+	}
+
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dis(0, vec.size() - 1);
+
+	int randomIndex = dis(gen);
+	int value = vec[randomIndex];
+
+	std::swap(vec[randomIndex], vec.back());
+	vec.pop_back();
+
+	return value;
+}
+
+#pragma endregion
+
+
 #pragma region hamiltonCycleApproximation
 bool GraphManager::tryGetRandomUnvisitedNeighbourNode(GraphData& graph_data, int node, std::unordered_set<int>& visited_nodes, int& random_neighbour_node)
 {
