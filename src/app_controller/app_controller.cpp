@@ -3,8 +3,8 @@
 
 void AppController::run(RunData& data)
 {
-    console_manager.clear();
-    if (input_manager.inputFileExists())
+	console_manager.clear();
+	if (input_manager.inputFileExists())
 		console_manager.write("Input files detected\n");
 	else
 	{
@@ -12,15 +12,15 @@ void AppController::run(RunData& data)
 		console_manager.waitForEnter();
 	}
 
-    console_manager.write("Loading input...\n");
-    graph_data_loader.loadGraphsData(graphs_data);
+	console_manager.write("Loading input...\n");
+	graph_data_loader.loadGraphsData(graphs_data);
 	console_manager.clear();
 
 #ifdef METRIC_TESTS
 	run_metric_tests();
 #endif
 
-// #define HAMILTON_TESTS
+	// #define HAMILTON_TESTS
 #ifdef HAMILTON_TESTS
 	run_hamilton_tests();
 #endif
@@ -49,7 +49,7 @@ void AppController::run(RunData& data)
 		console_manager.write("enter R to calculate approximate metric again for new indices\n");
 		line = input_manager.readLineFromStdin();
 	}
-	console_manager.waitForEnter();	
+	console_manager.waitForEnter();
 
 	console_manager.write("Finding minimum extentions with retry factor=" + std::to_string(data.hamilton.approx.retry_factor) + "...\n");
 	for (int i = 0; i < graphs_data.size(); ++i)
@@ -61,10 +61,23 @@ void AppController::run(RunData& data)
 	console_manager.listGraphsHamiltonCycleExtentions(graphs_data);
 	console_manager.waitForEnter();
 
+	/*
 	console_manager.write("Finding all longest cycles...\n");
 	for (int i = 0; i < graphs_data.size(); ++i)
+	{
 		graph_manager.findLongestCycles(graphs_data[i]);
+	}
     console_manager.waitForEnter();
+	*/
+
+	console_manager.write("Finding approximate longest cycles...\n");
+	for (int i = 0; i < graphs_data.size(); ++i) {
+		graph_manager.tryFindLongestCycles(graphs_data[i]);
+		console_manager.write("|- graph " + std::to_string(i) + ": Approximate longest cycles found.\n");
+	}
+	console_manager.listGraphsLongestCycles(graphs_data);
+
+	console_manager.waitForEnter();
 }
 
 void AppController::run_hamilton_tests()

@@ -227,18 +227,28 @@ void GraphManager::findLongestCycles(GraphData& graph_data)
 
 #pragma region longestCyclesApproximation
 
-bool GraphManager::tryFindLongestCycles(GraphData& graph_data)
+void GraphManager::tryFindLongestCycles(GraphData& graph_data)
 {
 	std::vector<std::vector<int>> resulting_cycles;
 	std::stack<std::pair<int, int>> stack_of_cycles;
 
-	std::vector<int> numbers(graph_data.getNodesCount(), 0);
-	std::vector<int> parent(graph_data.getNodesCount(), -1);
-	std::vector<bool> visited(graph_data.getNodesCount(), false);
+	GraphData temp_graph;
+
+	temp_graph.out_edges_by_node = graph_data.out_edges_by_node;
+	temp_graph.in_edges_by_node = graph_data.in_edges_by_node;
+
+	temp_graph.setNodesCount(graph_data.getNodesCount());
+	temp_graph.setInitialize(true);
+
+	transformToGraphWithoutEdgesAdjecentToLeafNode(temp_graph);
+
+	std::vector<int> numbers(temp_graph.getNodesCount(), 0);
+	std::vector<int> parent(temp_graph.getNodesCount(), -1);
+	std::vector<bool> visited(temp_graph.getNodesCount(), false);
 
 	int lastLargestCycle = 0;
 
-	for (int start = 0; start < graph_data.getNodesCount(); ++start) {
+	for (int start = 0; start < temp_graph.getNodesCount(); ++start) {
 
 		std::fill(numbers.begin(), numbers.end(), 0);
 		std::fill(parent.begin(), parent.end(), -1);
@@ -259,7 +269,7 @@ bool GraphManager::tryFindLongestCycles(GraphData& graph_data)
 
 			visited[current] = true;
 
-			std::vector<int> neighbors(graph_data.out_edges_by_node[current].begin(), graph_data.out_edges_by_node[current].end());
+			std::vector<int> neighbors(temp_graph.out_edges_by_node[current].begin(), temp_graph.out_edges_by_node[current].end());
 
 			while (!neighbors.empty()) {
 
@@ -325,9 +335,8 @@ bool GraphManager::tryFindLongestCycles(GraphData& graph_data)
 			}
 		}
 	}
-	//TODO use that method somewhere
-	//graph_data.assignLongestCycles(resulting_cycles);
-	return true;
+	graph_data.assignApproximateLongestCycles(resulting_cycles);
+	//return true;
 }
 
 bool GraphManager::isSameCycle(const std::vector<int>& cycle1, const std::vector<int>& cycle2)

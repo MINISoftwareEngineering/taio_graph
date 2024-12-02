@@ -29,7 +29,7 @@ public:
 
 #pragma region longestCyclesApproximation
 public:
-	bool tryFindLongestCycles(GraphData& graph_data);
+	void tryFindLongestCycles(GraphData& graph_data);
 private:
 	bool isSameCycle(const std::vector<int>& cycle1, const std::vector<int>& cycle2);
 	int takeOutRandomValue(std::vector<int>& vec);

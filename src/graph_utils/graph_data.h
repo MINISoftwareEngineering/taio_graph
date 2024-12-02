@@ -71,9 +71,28 @@ public:
         return longest_cycles;
     }
 
+    void assignApproximateLongestCycles(std::vector<std::vector<int>>& approximate_longest_cycles)
+    {
+        if (approximate_longest_cycles_assigned)
+            throw new std::runtime_error("Longest cycles already assigned.");
+
+        approximate_longest_cycles_assigned = true;
+        this->approximate_longest_cycles = approximate_longest_cycles;
+    }
+    const std::vector<std::vector<int>>& getApproximateLongestCycles()
+    {
+        if (!approximate_longest_cycles_assigned)
+            throw new std::runtime_error("Assign longest cycles first.");
+
+        return approximate_longest_cycles;
+    }
+
 private:
-    bool longest_cycles_assigned = false;
+    bool approximate_longest_cycles_assigned = false;
     std::vector<std::vector<int>> longest_cycles;
+
+    bool longest_cycles_assigned = false;
+    std::vector<std::vector<int>> approximate_longest_cycles;
 #pragma endregion
 
 #pragma region hamiltonCycleApproximation

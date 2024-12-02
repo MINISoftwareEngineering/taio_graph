@@ -104,6 +104,75 @@ struct ConsoleManager
         }
     }
 
+    void listGraphsLongestCycles(std::vector<GraphData>& graphs_data)
+    {
+        write("Graphs Longest Cycles: \n");
+
+        for (int i = 0; i < graphs_data.size(); ++i) {
+            GraphData& graph_data = graphs_data[i];
+            int graph_size = graph_manager.getGraphSize(graph_data);
+
+            /*
+            int longest_cycles_count = graph_data.getLongestCycles().size();
+            std::vector<std::vector<int>> longest_cycles_values = graph_data.getLongestCycles();
+
+            
+            if (longest_cycles_count > 0)
+            {
+                write("|- exact longest cycles (length " + std::to_string(longest_cycles_values[0].size()) + ") : \n");
+                for (int j = 0; j < longest_cycles_count; j++)
+                {
+                    write("|- cycle " + std::to_string(i) + ": \n");
+                    printCycle(longest_cycles_values[j]);
+                }
+            }
+            else
+            {
+                write("|- exact longest cycles: ");
+                write("  No cycles found!\n");
+            }
+            */
+
+            int approximate_longest_cycles_count = graph_data.getApproximateLongestCycles().size();
+            std::vector<std::vector<int>> approximate_longest_cycles_values = graph_data.getApproximateLongestCycles();
+
+            write("|-      graph " + std::to_string(i) + "    Size: " + std::to_string(graph_size) + ": \n");
+            
+
+            if (approximate_longest_cycles_count > 0)
+            {
+                write("|- approximate longest cycles (length " + std::to_string(approximate_longest_cycles_values[0].size()) + ") : \n");
+                for (int j = 0; j < approximate_longest_cycles_count; j++)
+                {
+                    write("|- cycle " + std::to_string(j) + ": \n");
+                    printCycle(approximate_longest_cycles_values[j]);
+                }
+            }
+            else
+            {
+                write("|- approximate longest cycles: ");
+                write("  No approximate cycles found!\n");
+            }
+
+        }
+    }
+
+    void printCycle(const std::vector<int>& cycle)
+    {
+        if (cycle.empty()) {
+            write("The cycle is empty.\n");
+            return;
+        }
+
+        write(std::to_string(cycle[0]));
+
+        for (int i = 1; i < cycle.size(); i++) {
+            write(" -> " + std::to_string(cycle[i]));
+        }
+
+        write("\n");
+    }
+
     void writeDistanceBetweenGraphs(std::vector<GraphData> graphs, int index1, int index2)
     {
         write("Metric distance between graphs " 
