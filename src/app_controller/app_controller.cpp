@@ -49,7 +49,52 @@ void AppController::run(RunData& data)
 		console_manager.write("enter R to calculate approximate metric again for new indices\n");
 		line = input_manager.readLineFromStdin();
 	}
-	console_manager.waitForEnter();	
+	console_manager.waitForEnter();
+
+
+	console_manager.write("Finding all longest cycles...\n");
+	for (int i = 0; i < graphs_data.size(); ++i)
+	{
+		int nodeCount = graphs_data[i].getNodesCount();
+		if (nodeCount <= 8)
+		{
+			graph_manager.findLongestCycles(graphs_data[i]);
+			console_manager.write("|- graph " + std::to_string(i) + ": Finding finished! \n");
+		}
+		else
+			console_manager.write("|- graph " + std::to_string(i) + ": vertex count > 8 - omitted! \n");
+	}
+	console_manager.clear();
+	console_manager.listLongestCycles(graphs_data);
+	console_manager.waitForEnter();
+
+
+	console_manager.write("Finding approximate longest cycles...\n");
+	for (int i = 0; i < graphs_data.size(); ++i) {
+		graph_manager.tryFindLongestCycles(graphs_data[i]);
+		console_manager.write("|- graph " + std::to_string(i) + ": Approximate longest cycles found.\n");
+	}
+	console_manager.clear();
+	console_manager.listGraphsLongestCycles(graphs_data);
+	console_manager.waitForEnter();
+
+
+	console_manager.write("Finding all Hamilton cycles and minimum extensions...\n");
+	for (int i = 0; i < graphs_data.size(); ++i)
+	{
+		int nodeCount = graphs_data[i].getNodesCount();
+		if (nodeCount <= 8)
+		{
+			graph_manager.findHamiltonCycle(graphs_data[i]);
+			console_manager.write("|- graph " + std::to_string(i) + ": Finding finished! \n");
+		}
+		else
+			console_manager.write("|- graph " + std::to_string(i) + ": vertex count > 8 - omitted! \n");
+	}
+	console_manager.clear();
+	console_manager.listPreciseGraphsHamiltonCycleExtentions(graphs_data);
+	console_manager.waitForEnter();
+
 
 	console_manager.write("Finding minimum extentions with retry factor=" + std::to_string(data.hamilton.approx.retry_factor) + "...\n");
 	for (int i = 0; i < graphs_data.size(); ++i)
@@ -61,10 +106,9 @@ void AppController::run(RunData& data)
 	console_manager.listGraphsHamiltonCycleExtentions(graphs_data);
 	console_manager.waitForEnter();
 
-	console_manager.write("Finding all longest cycles...\n");
-	for (int i = 0; i < graphs_data.size(); ++i)
-		graph_manager.findLongestCycles(graphs_data[i]);
-    console_manager.waitForEnter();
+
+
+
 }
 
 void AppController::run_hamilton_tests()

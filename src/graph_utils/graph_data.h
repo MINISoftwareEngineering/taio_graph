@@ -70,10 +70,92 @@ public:
 
         return longest_cycles;
     }
-
+    bool isLongestCyclesAssigned()
+    {
+        return longest_cycles_assigned;
+    }
+    void assignApproximateLongestCycles(std::vector<std::vector<int>>& approximate_longest_cycles)
+    {
+        if (approximate_longest_cycles_assigned)
+            throw new std::runtime_error("Longest cycles already assigned.");
+        approximate_longest_cycles_assigned = true;
+        this->approximate_longest_cycles = approximate_longest_cycles;
+    }
+    const std::vector<std::vector<int>>& getApproximateLongestCycles()
+    {
+        if (!approximate_longest_cycles_assigned)
+            throw new std::runtime_error("Assign longest cycles first.");
+        return approximate_longest_cycles;
+    }
+    void assignLongestCyclesTime(std::chrono::milliseconds& longest_cycles_time)
+    {
+        this->longest_cycles_time = longest_cycles_time;
+    }
+    std::chrono::milliseconds getLongestCyclesTime()
+    {
+        return longest_cycles_time;
+    }
+    void assignApproximateLongestCyclesTime(std::chrono::milliseconds& approximate_longest_cycles_time)
+    {
+        this->approximate_longest_cycles_time = approximate_longest_cycles_time;
+    }
+    std::chrono::milliseconds getApproximateLongestCyclesTime()
+    {
+        return approximate_longest_cycles_time;
+    }
 private:
     bool longest_cycles_assigned = false;
+    bool approximate_longest_cycles_assigned = false;
+
     std::vector<std::vector<int>> longest_cycles;
+    std::vector<std::vector<int>> approximate_longest_cycles;
+    std::chrono::milliseconds longest_cycles_time;
+    std::chrono::milliseconds approximate_longest_cycles_time;
+
+#pragma endregion
+
+#pragma region hamiltonCycle
+public:
+    void assignHamiltonCyclesAndExtensions(std::vector<std::pair<int, int>>& smallest_extension, int& cycle_count)
+    {
+        if (precise_hamilton_cycles_extensions_assigned)
+            throw new std::runtime_error("Precise Hamilton cycles and extensions already assigned.");
+
+        precise_hamilton_cycles_extensions_assigned = true;
+        this->precise_hamilton_cycle_graph_extention = smallest_extension;
+        this->precise_hamilton_cycle_count = cycle_count;
+    }
+    const std::vector<std::pair<int, int>> getPreciseHamiltonCycleGraphExtension()
+    {
+        if (!precise_hamilton_cycles_extensions_assigned)
+            throw new std::runtime_error("Assign Hamilton cycle extension first.");
+
+        return precise_hamilton_cycle_graph_extention;
+    }
+    const int getPreciseHamiltonCycleCount()
+    {
+        if (!precise_hamilton_cycles_extensions_assigned)
+            throw new std::runtime_error("Assign Hamilton cycles count first.");
+
+        return precise_hamilton_cycle_count;
+    }
+    bool isPreciseHamiltonCycleGraphExtentionAssigned()
+    {
+        return precise_hamilton_cycles_extensions_assigned;
+    }
+    void AssignPreciseHamiltonCycleTime(std::chrono::milliseconds& precise_hamilton_cycle_time)
+    {
+        this->precise_hamilton_cycle_time = precise_hamilton_cycle_time;
+    }
+    std::chrono::milliseconds getPreciseHamiltonCycleTime()
+    {
+        return precise_hamilton_cycle_time;
+    }
+private:
+    bool precise_hamilton_cycles_extensions_assigned = false;
+    std::vector<std::pair<int,int>> precise_hamilton_cycle_graph_extention;
+    int precise_hamilton_cycle_count;
+    std::chrono::milliseconds precise_hamilton_cycle_time;
 #pragma endregion
 
 #pragma region hamiltonCycleApproximation

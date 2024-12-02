@@ -212,17 +212,296 @@ void GraphManager::generateGraphPermutations(GraphData& graph_data, std::functio
 
 #pragma endregion
 
+
+
 #pragma region longestCycles
+
+void GraphManager::traverseNeighbours(GraphData& graph_data, std::vector<std::vector<int>>& longest_cycles, std::vector<int>& current_path, int& longest_cycle_length)
+{
+	int last_vertex = current_path.back();
+	std::unordered_set<int> out_neighbours = graph_data.out_edges_by_node[last_vertex];
+	for (int neighbour : out_neighbours)
+	{
+		if (neighbour == current_path.front())
+		{
+			if (current_path.size() >= longest_cycle_length)
+			{
+				if (current_path.size() > longest_cycle_length)
+				{
+					longest_cycle_length = current_path.size();
+					longest_cycles.clear();
+				}
+
+				std::vector<int> ordered_cycle;
+				auto min_vertex = std::min_element(current_path.begin(), current_path.end());
+				int min_index = std::distance(current_path.begin(), min_vertex);
+				ordered_cycle.insert(ordered_cycle.end(), current_path.begin() + min_index, current_path.end());
+				ordered_cycle.insert(ordered_cycle.end(), current_path.begin(), current_path.begin() + min_index);
+				ordered_cycle.push_back(ordered_cycle.front());
+				if (std::find(longest_cycles.begin(), longest_cycles.end(), ordered_cycle) == longest_cycles.end())
+					longest_cycles.push_back(ordered_cycle);
+			}
+		}
+		if (std::find(current_path.begin(), current_path.end(), neighbour) == current_path.end())
+		{
+			current_path.push_back(neighbour);
+			traverseNeighbours(graph_data, longest_cycles, current_path, longest_cycle_length);
+			current_path.pop_back();
+		}
+	}
+}
+
 void GraphManager::findLongestCycles(GraphData& graph_data)
 {
-	throw new std::runtime_error("Method not implemented.");
+	auto start = std::chrono::high_resolution_clock::now();
 
 	std::vector<std::vector<int>> longest_cycles;
+	std::vector<int> current_path;
 
-	// TODO: actually compute those cycles
+	int longest_cycle_length = 0;
 
+	for (int i = 0; i < graph_data.getNodesCount(); i++)
+	{
+		current_path.push_back(i);
+		traverseNeighbours(graph_data, longest_cycles, current_path, longest_cycle_length);
+		current_path.pop_back();
+	}
 	graph_data.assignLongestCycles(longest_cycles);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+	graph_data.assignLongestCyclesTime(duration);
 }
+
+#pragma endregion
+
+
+#pragma region longestCyclesApproximation
+void GraphManager::tryFindLongestCycles(GraphData& graph_data)
+{
+	auto start = std::chrono::high_resolution_clock::now();
+
+	std::vector<std::vector<int>> resulting_cycles;
+	std::stack<std::pair<int, int>> stack_of_cycles;
+	GraphData temp_graph;
+	temp_graph.out_edges_by_node = graph_data.out_edges_by_node;
+	temp_graph.in_edges_by_node = graph_data.in_edges_by_node;
+	temp_graph.setNodesCount(graph_data.getNodesCount());
+	temp_graph.setInitialize(true);
+	transformToGraphWithoutEdgesAdjecentToLeafNode(temp_graph);
+	std::vector<int> numbers(temp_graph.getNodesCount(), 0);
+	std::vector<int> parent(temp_graph.getNodesCount(), -1);
+	std::vector<bool> visited(temp_graph.getNodesCount(), false);
+	int lastLargestCycle = 0;
+	for (int start = 0; start < temp_graph.getNodesCount(); ++start) {
+
+		std::fill(numbers.begin(), numbers.end(), 0);
+		std::fill(parent.begin(), parent.end(), -1);
+		std::fill(visited.begin(), visited.end(), false);
+
+		numbers[start] = 1;
+
+		std::stack<int> stack;
+		stack.push(start);
+
+		while (!stack.empty()) {
+			int current = stack.top();
+			stack.pop();
+
+			if (visited[current]) {
+				continue;
+			}
+
+			visited[current] = true;
+			std::vector<int> neighbors(temp_graph.out_edges_by_node[current].begin(), temp_graph.out_edges_by_node[current].end());
+
+			while (!neighbors.empty()) {
+
+				int neighbor = takeOutRandomValue(neighbors);
+
+				if (numbers[neighbor] == 0) {
+					numbers[neighbor] = numbers[current] + 1;
+					parent[neighbor] = current;
+					stack.push(neighbor);
+				}
+				else {
+					int newDifference = numbers[current] - numbers[neighbor];
+					if (newDifference > 2 && newDifference >= lastLargestCycle) {
+
+						bool isProperCycle = false;
+						int checkVert = current;
+
+						while (checkVert != -1) {
+							checkVert = parent[checkVert];
+							if (checkVert == neighbor) {
+								isProperCycle = true;
+								break;
+							}
+						}
+
+						if (newDifference > lastLargestCycle && isProperCycle) {
+							lastLargestCycle = newDifference;
+							resulting_cycles.clear();
+							while (!stack_of_cycles.empty()) stack_of_cycles.pop();
+							stack_of_cycles.push({ neighbor, current });
+						}
+						else if (isProperCycle) {
+							stack_of_cycles.push({ neighbor, current });
+						}
+					}
+				}
+			}
+		}
+
+		while (!stack_of_cycles.empty()) {
+			auto [startCycle, endCycle] = stack_of_cycles.top();
+			stack_of_cycles.pop();
+
+			std::vector<int> cycle;
+			int currentVertex = endCycle;
+			while (currentVertex != startCycle) {
+				cycle.push_back(currentVertex);
+				currentVertex = parent[currentVertex];
+			}
+			cycle.push_back(startCycle);
+			std::reverse(cycle.begin(), cycle.end());
+
+			bool isUnique = true;
+			for (int i = 0; i < resulting_cycles.size(); i++) {
+				if (isSameCycle(cycle, resulting_cycles[i])) {
+					isUnique = false;
+					break;
+				}
+			}
+
+			if (isUnique) {
+				resulting_cycles.push_back(cycle);
+			}
+		}
+	}
+	graph_data.assignApproximateLongestCycles(resulting_cycles);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+	graph_data.assignApproximateLongestCyclesTime(duration);
+}
+bool GraphManager::isSameCycle(const std::vector<int>& cycle1, const std::vector<int>& cycle2)
+{
+	if (cycle1.size() != cycle2.size()) {
+		return false;
+	}
+	int startVertex = cycle1[0];
+	int cycleSize = cycle1.size();
+	auto it = std::find(cycle2.begin(), cycle2.end(), startVertex);
+	if (it == cycle2.end()) {
+		return false;
+	}
+	int startIdxInCycle2 = std::distance(cycle2.begin(), it);
+	bool isSameClockwise = true;
+	bool isSameCounterClockwise = true;
+	for (int i = 0; i < cycleSize; ++i) {
+		if (cycle1[i] != cycle2[(startIdxInCycle2 + i) % cycleSize]) {
+			isSameClockwise = false;
+		}
+		if (cycle1[i] != cycle2[(startIdxInCycle2 - i + cycleSize) % cycleSize]) {
+			isSameCounterClockwise = false;
+		}
+		if (!isSameClockwise && !isSameCounterClockwise) {
+			return false;
+		}
+	}
+	return true;
+}
+int GraphManager::takeOutRandomValue(std::vector<int>& vec) {
+	if (vec.empty()) {
+		return -1;
+	}
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dis(0, vec.size() - 1);
+	int randomIndex = dis(gen);
+	int value = vec[randomIndex];
+	std::swap(vec[randomIndex], vec.back());
+	vec.pop_back();
+	return value;
+}
+#pragma endregion
+
+
+#pragma region hamiltonCycle
+void GraphManager::traverseOtherVertices(GraphData& graph_data, std::vector<std::pair<int, int>>& smallest_extension, std::vector<std::pair<int, int>>& current_extension, std::vector<int>& current_path, int& hamilton_cycle_count)
+{
+	int last_vertex = current_path.back();
+	std::unordered_set<int> out_neighbours = graph_data.out_edges_by_node[last_vertex];
+
+	if (current_path.size() == graph_data.getNodesCount())
+	{
+		if (out_neighbours.find(current_path.front()) == out_neighbours.end())
+			current_extension.push_back(std::pair<int, int>(last_vertex, current_path.front()));
+
+		if (current_extension.size() == 0)
+		{
+			smallest_extension.clear();
+			hamilton_cycle_count++;
+		}
+
+
+		if (hamilton_cycle_count == 0)
+		{
+			if (smallest_extension.size() == 0 || smallest_extension.size() > current_extension.size()) // No extensions found yet or the new one is shorter
+				smallest_extension = current_extension;
+		}
+
+		if (out_neighbours.find(current_path.front()) == out_neighbours.end())
+			current_extension.pop_back();
+		return;
+	}
+
+
+	for (int i = 0; i < graph_data.getNodesCount(); i++)
+	{
+		if (std::find(current_path.begin(), current_path.end(), i) == current_path.end())
+		{
+			if (out_neighbours.find(i) == out_neighbours.end())
+				current_extension.push_back(std::pair<int, int>(last_vertex, i));
+			current_path.push_back(i);
+			traverseOtherVertices(graph_data, smallest_extension, current_extension, current_path, hamilton_cycle_count);
+			if (out_neighbours.find(i) == out_neighbours.end())
+				current_extension.pop_back();
+			current_path.pop_back();
+		}
+	}
+
+}
+
+void GraphManager::findHamiltonCycle(GraphData& graph_data)
+{
+	auto start = std::chrono::high_resolution_clock::now();
+
+	std::vector<std::pair<int, int>> smallest_extension;
+	std::vector<std::pair<int, int>> current_extension;
+	std::vector<int> current_path;
+
+	int hamilton_cycle_count = 0;
+
+	for (int i = 0; i < graph_data.getNodesCount(); i++)
+	{
+		current_path.push_back(i);
+		traverseOtherVertices(graph_data, smallest_extension, current_extension, current_path, hamilton_cycle_count);
+		current_path.pop_back();
+	}
+
+	hamilton_cycle_count /= graph_data.getNodesCount();
+	graph_data.assignHamiltonCyclesAndExtensions(smallest_extension, hamilton_cycle_count);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+	graph_data.AssignPreciseHamiltonCycleTime(duration);
+}
+
 #pragma endregion
 
 #pragma region hamiltonCycleApproximation

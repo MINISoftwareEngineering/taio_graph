@@ -24,13 +24,22 @@ public:
 
 #pragma region longestCycles
 public:
+	void traverseNeighbours(GraphData& graph_data, std::vector<std::vector<int>>& longest_cycles, std::vector<int>& current_path, int& longest_cycle_length);
 	void findLongestCycles(GraphData& graph_data);
 #pragma endregion
 
 #pragma region longestCyclesApproximation
+public:
+	void tryFindLongestCycles(GraphData& graph_data);
+private:
+	bool isSameCycle(const std::vector<int>& cycle1, const std::vector<int>& cycle2);
+	int takeOutRandomValue(std::vector<int>& vec);
 #pragma endregion
 
 #pragma region hamiltonCycle
+public:
+	void traverseOtherVertices(GraphData& graph_data, std::vector<std::pair<int, int>>& smallest_extension, std::vector<std::pair<int, int>>& current_extension, std::vector<int>& current_path, int& hamilton_cycle_count);
+	void findHamiltonCycle(GraphData& graph_data);
 #pragma endregion
 
 #pragma region hamiltonCycleApproximation
