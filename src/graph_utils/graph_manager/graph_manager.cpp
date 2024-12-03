@@ -314,6 +314,9 @@ void GraphManager::tryFindLongestCycles(GraphData& graph_data)
 			}
 
 			visited[current] = true;
+
+			if(current!=start)	numbers[current] = numbers[parent[current]] + 1;
+
 			std::vector<int> neighbors(temp_graph.out_edges_by_node[current].begin(), temp_graph.out_edges_by_node[current].end());
 
 			while (!neighbors.empty()) {
@@ -321,13 +324,12 @@ void GraphManager::tryFindLongestCycles(GraphData& graph_data)
 				int neighbor = takeOutRandomValue(neighbors);
 
 				if (numbers[neighbor] == 0) {
-					numbers[neighbor] = numbers[current] + 1;
 					parent[neighbor] = current;
 					stack.push(neighbor);
 				}
 				else {
 					int newDifference = numbers[current] - numbers[neighbor];
-					if (newDifference > 2 && newDifference >= lastLargestCycle) {
+					if (newDifference > 0 && newDifference >= lastLargestCycle) {
 
 						bool isProperCycle = false;
 						int checkVert = current;

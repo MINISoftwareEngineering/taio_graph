@@ -172,7 +172,7 @@ struct ConsoleManager
                     else
                     {
                         std::vector<int> first_longest_cycle = longest_cycles[0];
-                        write("|  |- longest cycle length: " + std::to_string(first_longest_cycle.size()) + " (" + std::to_string(longest_cycles.size()) + " cycles)\n");
+                        write("|  |- longest cycle length: " + std::to_string(first_longest_cycle.size() - 1) + " (" + std::to_string(longest_cycles.size()) + " cycles)\n");
                         write("|  |- first result:");
                         for (int j = 0; j < first_longest_cycle.size(); j++)
                             write(" " + std::to_string(first_longest_cycle[j]));
