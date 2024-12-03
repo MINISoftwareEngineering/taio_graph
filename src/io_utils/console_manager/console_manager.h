@@ -123,7 +123,7 @@ struct ConsoleManager
 
     void listGraphsHamiltonCycleExtentions(std::vector<GraphData>& graphs_data)
     {
-        write("Graphs Hamilton Cycle extentions: \n");
+        write("Approximate Graphs Hamilton Cycle extentions: \n");
         for (int i = 0; i < graphs_data.size(); ++i)
         {
             GraphData& graph_data = graphs_data[i];
@@ -194,7 +194,7 @@ struct ConsoleManager
 
     void listGraphsLongestCycles(std::vector<GraphData>& graphs_data)
     {
-        write("Graphs Longest Cycles: \n");
+        write("Approximate Graphs Longest Cycles: \n");
         for (int i = 0; i < graphs_data.size(); ++i) {
             GraphData& graph_data = graphs_data[i];
             int graph_size = graph_manager.getGraphSize(graph_data);
