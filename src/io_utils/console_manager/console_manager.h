@@ -102,7 +102,7 @@ struct ConsoleManager
                     //write("|  |- finding full solution time: " + full_execution_time + " ms  (finding minumum graph: " + find_extention_execution_time + " ms, finding hamilton cycles: " + find_cycles_execution_time + " ms) \n");
                     write("|  |- execution time: " + std::to_string(duration.count()) + "ms\n");
                     write("|  |- hamilton cycles: " + precise_hamilton_cycles_count + " \n");
-                    write("|  |- smallest extention: \n|  |- [");
+                    write("|  |- smallest extention (edges count: " + std::to_string(graph_data.getPreciseHamiltonCycleGraphExtension().size()) + "): \n|  |- [");
                     
                     std::vector<std::pair<int, int>> precise_hamilton_cycle_graph_extention = graph_data.getPreciseHamiltonCycleGraphExtension();
                     for (int j = 0; j < precise_hamilton_cycle_graph_extention.size(); j++)
@@ -140,7 +140,7 @@ struct ConsoleManager
                 write("|- graph " + std::to_string(i) + ": \n");
                 write("|  |- finding full solution time: " + full_execution_time + " ms  (finding minumum graph: " + find_extention_execution_time + " ms, finding hamilton cycles: " + find_cycles_execution_time + " ms) \n");
                 write("|  |- hamilton cycles: " + hamilton_cycles_count + " \n");
-                write("|  |- smallest extention: \n");
+                write("|  |- smallest extention (edges count: " + std::to_string(graph_data.getHamiltonCycleGraphExtentionSize()) + "): \n");
                 write(graph_data.getHamiltonCycleGraphExtention());
             }
             else
