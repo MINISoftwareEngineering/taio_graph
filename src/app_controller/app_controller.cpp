@@ -26,44 +26,53 @@ void AppController::run(RunData& data)
 #endif
 
 	std::string line = "x";
-	int index1 = 0;
-	int index2 = 1;
 
-	console_manager.write("Enter S to skip metric (or enter to proceed) \n");
+	console_manager.write("Enter S to skip metric caculation stage(or enter to proceed)\n");
 	line = input_manager.readLineFromStdin();
 	if (line != "S")
 	{
+		console_manager.clear();
 		line = "R";
-		while (line == "R") {
-			console_manager.write("Select graph indices for metric calculations\n");
-			index1 = input_manager.readNumber();
-			index2 = input_manager.readNumber();
+		while (line == "R" || line == "r") {
+			console_manager.write("Select graph indices for metric calculations (indices separted by space or enter)\n");
+			console_manager.write("Don't select graphs with size larger than 8 (computations will take too long)\n");
+			console_manager.writeGraphsIndiciesWithSizes(graphs_data);
+			std::pair<int, int> indices = getSelectedIndices(graphs_data);
+			if (graphs_data[indices.first].getNodesCount() > 8 
+				|| graphs_data[indices.second].getNodesCount() > 8) {
+				console_manager.write("Selected graph with size larger than 8 (computations would take too long)!\n");
+				console_manager.write("----- Try again -----\n");
+				continue;
+			}
+
 			console_manager.waitForEnter();
-			console_manager.writeDistanceBetweenGraphs(graphs_data, index1, index2);
-			console_manager.write("enter R to calculate metric again for new indices\n");
+			console_manager.writeDistanceBetweenGraphs(graphs_data, indices.first, indices.second);
+			console_manager.write("R to calculate metric again for new indices (press enter to go to the next stage)\n");
 			line = input_manager.readLineFromStdin();
 		}
 	}
+	console_manager.clear();
 	line = "x";
-	console_manager.waitForEnter();
 
-	console_manager.write("Enter S to skip approximate metric (or enter to proceed) \n");
+	console_manager.write("Enter S to skip approximate metric caculation stage(or enter to proceed)\n");
 	line = input_manager.readLineFromStdin();
 	if (line != "S")
 	{
+		console_manager.clear();
 		line = "R";
-		while (line == "R") {
-			console_manager.write("Select graph indices for approximate metric calculations\n");
-			index1 = input_manager.readNumber();
-			index2 = input_manager.readNumber();
+		while (line == "R" || line == "r") {
+			console_manager.write("Select graph indices for approximate metric calculations (indices separted by space or enter)\n");
+			console_manager.writeGraphsIndiciesWithSizes(graphs_data);
+			std::pair<int, int> indices = getSelectedIndices(graphs_data);
+
 			console_manager.waitForEnter();
-			console_manager.writeApproximateDistanceBetweenGraph(graphs_data, index1, index2);
-			console_manager.write("enter R to calculate approximate metric again for new indices\n");
+			console_manager.writeApproximateDistanceBetweenGraph(graphs_data, indices.first, indices.second);
+			console_manager.write("R to calculate approximate metric again for new indices (press enter to go to the next stage)\n");
 			line = input_manager.readLineFromStdin();
 		}
 	}
+	console_manager.clear();
 	line = "x";
-	console_manager.waitForEnter();	
 
 
 	console_manager.write("Enter S to skip finding all longest cycles (or enter to proceed) \n");
@@ -80,7 +89,7 @@ void AppController::run(RunData& data)
 				console_manager.write("|- graph " + std::to_string(i) + ": Finding finished! \n");
 			}
 			else
-				console_manager.write("|- graph " + std::to_string(i) + ": vertex count > 8 - omitted! \n");
+				console_manager.write("|- graph " + std::to_string(i) + ": vertex count is larger than 8 - omitted (computations would take to long)! \n");
 		}
 		console_manager.clear();
 		console_manager.listLongestCycles(graphs_data);
@@ -241,4 +250,38 @@ void AppController::run_metric_tests() {
 	}
 
 	writeDataToCSV(metric_test_output, rows);
+}
+
+std::pair<int, int> AppController::getSelectedIndices(std::vector<GraphData> graphs_data) {
+	int index1;
+	int index2;
+
+	bool selectIndex1 = true;
+	int indices_limit = graphs_data.size() - 1;
+	while (selectIndex1) {
+		index1 = input_manager.readNumber();
+
+		if (indices_limit < index1 || index1 < 0) {
+			console_manager.write("Select an index within provided range (0,"
+				+ std::to_string(indices_limit) + ")\n");
+		}
+		else {
+			selectIndex1 = false;
+		}
+	}
+
+	bool selectIndex2 = true;
+	while (selectIndex2) {
+		index2 = input_manager.readNumber();
+
+		if (indices_limit < index2 || index2 < 0) {
+			console_manager.write("Select an index within provided range (0,"
+				+ std::to_string(indices_limit) + ")\n");
+		}
+		else {
+			selectIndex2 = false;
+		}
+	}
+
+	return std::make_pair(index1, index2);
 }
