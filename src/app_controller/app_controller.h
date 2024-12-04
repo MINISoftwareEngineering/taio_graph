@@ -30,4 +30,5 @@ private:
     std::vector<GraphData> graphs_data;
     std::vector<GraphData> metric_tests_graphs;
     std::vector<GraphData> hamilton_tests_graphs;
+    std::pair<int, int> getSelectedIndices(std::vector<GraphData> graphs_data);
 };
