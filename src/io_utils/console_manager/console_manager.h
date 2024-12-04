@@ -246,6 +246,17 @@ struct ConsoleManager
             + std::to_string(graph_manager.tryGetMetricDistance(graphs[index1], graphs[index2])) + " \n");
     }
 
+    void writeGraphsIndiciesWithSizes(std::vector<GraphData> graphs) {
+
+        write("List of available graphs loaded from data files, the output format is: index(size)\n");
+        int index = 0;
+        for (auto& graph : graphs) {
+            write(std::to_string(index++) + "(" + std::to_string(graph.getNodesCount()) + ") ");
+        }
+        write("\n");
+    }
+
+
 private:
     GraphManager graph_manager;
 };
