@@ -140,7 +140,9 @@ void AppController::run(RunData& data)
 	line = input_manager.readLineFromStdin();
 	if (line != "S")
 	{
-		console_manager.write("Enter retryFactor, or Enter for default value (10) \n");
+		console_manager.write("Enter retryFactor, or Enter for default value (10). \n");
+		console_manager.write("Minimum value is 1 and it is advised to enter values smaller than 16. \n");
+		console_manager.write("After entering retryFactor value, press enter. \n");
 		line = input_manager.readLineFromStdin();
 		int retry_factor = data.hamilton.approx.retry_factor;
 		if (line != "")
