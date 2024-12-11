@@ -75,3 +75,16 @@ void GraphsDataLoader::loadGraphsData(std::vector<GraphData>& graphs_data)
     for (const std::string& input_path : input_paths)
         loadGraphsFromFileData(graphs_data, input_path, id_offset);
 }
+GraphData GraphsDataLoader::loadGraphFromFile(std::string file_path)
+{
+    std::vector<GraphData> graphs;
+    int id_offset = 0;
+    loadGraphsFromFileData(graphs, file_path, id_offset);
+
+    if (graphs.size() == 0) {
+        std::cerr << "No graphs were found in provided file" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    return graphs.at(0);
+}

@@ -5,6 +5,7 @@
 
 struct GraphsDataLoader
 {
+    GraphData loadGraphFromFile(std::string file_path);
     void loadGraphsData(std::vector<GraphData>& graphs_data);
     void loadGraphsFromFileData(std::vector<GraphData>& graphs_data, std::string input_path, int& id_offset);
 private:
