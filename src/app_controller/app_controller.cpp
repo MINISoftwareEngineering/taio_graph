@@ -1,8 +1,55 @@
-#include "app_controller.h"
+﻿#include "app_controller.h"
 #include "output_manger/output_manager.h"
 
-void AppController::run(RunData& data)
+void AppController::run(ProgramCommand command, RunData& data)
 {
+	switch (command.command_name) {
+		case CommandName::Help:
+		{
+			display_help();
+			return;
+		}
+		case CommandName::Distance: {
+			if (!input_manager.inputFilesExist(command.files.at(0), command.files.at(1))) {
+				std::cerr << "Podane pliki z danymi grafow nie zostaly znalezione" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+
+			GraphData graph1 = graph_data_loader.loadGraphFromFile(command.files.at(0));
+			GraphData graph2 = graph_data_loader.loadGraphFromFile(command.files.at(1));
+
+			if (command.algorithm_type == AlgorithmType::Exact || command.algorithm_type == AlgorithmType::Both) {
+				console_manager.write("Obliczanie dokladnej metryki miedzy grafami...\n");
+				int distance = graph_manager.getMetricDistance(graph1, graph2);
+				console_manager.write("Dokladna metryka = " + std::to_string(distance) + " \n");
+			}
+
+			if (command.algorithm_type == AlgorithmType::Approximate || command.algorithm_type == AlgorithmType::Both)
+			{
+				console_manager.write("Obliczanie aproksymacji metryki miedzy grafami...\n");
+				int distance = graph_manager.tryGetMetricDistance(graph1, graph2);
+				console_manager.write("Aproksymacja metryki = " + std::to_string(distance) + " \n");
+			}
+
+			return;
+		}
+		case CommandName::Size:
+		{
+			if (!input_manager.inputFileExists(command.files.at(0))) {
+				std::cerr << "Podany plik z danymi grafu, nie istnieje" << std::endl;
+			}
+
+			GraphData graph = graph_data_loader.loadGraphFromFile(command.files.at(0));
+
+			console_manager.write("Obliczanie rozmiaru grafu...\n");
+			int size = graph_manager.getGraphSize(graph);
+			console_manager.write("Rozmiar grafu to = " + std::to_string(size) + "\n");
+
+			return;
+		}
+	}
+
+
     console_manager.clear();
     if (input_manager.inputFileExists())
 		console_manager.write("Input files detected\n");
@@ -36,10 +83,6 @@ void AppController::run(RunData& data)
 		line = "R";
 		while (line == "R") {
 			console_manager.write("Select graph indices for metric calculations\n");
-			index1 = input_manager.readNumber();
-			index2 = input_manager.readNumber();
-			console_manager.waitForEnter();
-			console_manager.writeDistanceBetweenGraphs(graphs_data, index1, index2);
 			console_manager.write("enter R to calculate metric again for new indices\n");
 			line = input_manager.readLineFromStdin();
 		}
@@ -186,4 +229,26 @@ void AppController::run_metric_tests() {
 	}
 
 	writeDataToCSV(metric_test_output, rows);
+}
+
+
+void AppController::display_help() 
+{
+	std::string program_name = "taio_graph.exe";
+	std::cout << "Uzycie programu: " << program_name << " [Opcje]\n\n"
+		<< "Opcje:\n"
+		<< std::setw(25) << std::left << "  --help" << " wyswietl to menu\n"
+		<< std::setw(25) << std::left << "  -h, --hamilton" << " approx | exact | both\n"
+		<< std::setw(25) << std::left << "  -s, --size" << " exact\n"
+		<< std::setw(25) << std::left << "  -c, --cycles" << " approx | exact | both\n"
+		<< std::setw(25) << std::left << "  -d, --distance" << " approx | exact | both\n"
+		<< std::setw(25) << std::left << "  -f, [nazwa_pliku]" << " dla opcji -h, -s, -c\n"
+		<< std::setw(25) << std::left << "  -f1 [nazwa_pliku1]" << " dla opcji -d\n"
+		<< std::setw(25) << std::left << "  -f2 [nazwa_pliku2]" << " dla opcji -d\n\n"
+		<< "Przyklady:\n"
+		<< "  " << program_name << " --help\n"
+		<< "  " << program_name << " -h approx -f graph1.txt\n"
+		<< "  " << program_name << " -s exact -f graph1.txt\n"
+		<< "  " << program_name << " -c both -f graph1.txt\n"
+		<< "  " << program_name << " -d both -f1 graph1.txt -f2 graph2.txt\n";
 }

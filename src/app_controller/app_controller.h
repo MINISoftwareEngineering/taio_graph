@@ -4,6 +4,7 @@
 #include <console_manager/console_manager.h>
 #include <graph_data_loader/graph_data_loader.h>
 #include <graph_manager/graph_manager.h>
+#include <program_commanmd.h>
 
 struct RunData
 {
@@ -18,10 +19,10 @@ struct RunData
 
 struct AppController
 {
-    void run(RunData& data);
+    void run(ProgramCommand command, RunData& data);
     void run_metric_tests();
     void run_hamilton_tests();
-
+    void display_help();
 private:
     InputManager input_manager;
     ConsoleManager console_manager;
