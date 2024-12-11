@@ -102,7 +102,7 @@ struct ConsoleManager
                     //write("|  |- finding full solution time: " + full_execution_time + " ms  (finding minumum graph: " + find_extention_execution_time + " ms, finding hamilton cycles: " + find_cycles_execution_time + " ms) \n");
                     write("|  |- execution time: " + std::to_string(duration.count()) + "ms\n");
                     write("|  |- hamilton cycles: " + precise_hamilton_cycles_count + " \n");
-                    write("|  |- smallest extention (edges count: " + std::to_string(graph_data.getPreciseHamiltonCycleGraphExtension().size()) + "): \n|  |- [");
+                    write("|  |- smallest extention: \n|  |- [");
                     
                     std::vector<std::pair<int, int>> precise_hamilton_cycle_graph_extention = graph_data.getPreciseHamiltonCycleGraphExtension();
                     for (int j = 0; j < precise_hamilton_cycle_graph_extention.size(); j++)
@@ -140,14 +140,13 @@ struct ConsoleManager
                 write("|- graph " + std::to_string(i) + ": \n");
                 write("|  |- finding full solution time: " + full_execution_time + " ms  (finding minumum graph: " + find_extention_execution_time + " ms, finding hamilton cycles: " + find_cycles_execution_time + " ms) \n");
                 write("|  |- hamilton cycles: " + hamilton_cycles_count + " \n");
-                write("|  |- smallest extention (edges count: " + std::to_string(graph_data.getHamiltonCycleGraphExtentionSize()) + "): \n");
+                write("|  |- smallest extention: \n");
                 write(graph_data.getHamiltonCycleGraphExtention());
             }
             else
                 write("|- graph " + std::to_string(i) + ": Finding failed \n");
         }
     }
-
 
     void listLongestCycles(std::vector<GraphData>& graphs_data)
     {
@@ -175,7 +174,8 @@ struct ConsoleManager
                         std::vector<int> first_longest_cycle = longest_cycles[0];
                         write("|  |- longest cycle length: " + std::to_string(first_longest_cycle.size() - 1) + " (" + std::to_string(longest_cycles.size()) + " cycles)\n");
                         write("|  |- first result:");
-                        printCycle(first_longest_cycle);
+                        for (int j = 0; j < first_longest_cycle.size(); j++)
+                            write(" " + std::to_string(first_longest_cycle[j]));
                         write("\n");
                     }
 
@@ -229,47 +229,22 @@ struct ConsoleManager
         for (int i = 1; i < cycle.size(); i++) {
             write(" -> " + std::to_string(cycle[i]));
         }
-        write(" -> " + std::to_string(cycle[0]));
-
         write("\n");
     }
 
 
     void writeDistanceBetweenGraphs(std::vector<GraphData> graphs, int index1, int index2)
     {
-        write("Calculating accurate metric between graph "
-            + std::to_string(index1) + "(" + std::to_string(graphs.at(index1).getNodesCount()) + ")" + " and graph "
-            + std::to_string(index2) + "(" + std::to_string(graphs.at(index2).getNodesCount()) + ")\n");
-
-        write("Finished calcualting metric distance between graphs "
-            + std::to_string(graphs[index1].getId()) + " and " + std::to_string(graphs[index2].getId())
-            + ".\nThe result is "
+        write("Metric distance between graphs " 
+            + std::to_string(graphs[index1].getId()) + " and " + std::to_string(graphs[index2].getId()) + ": "
             + std::to_string(graph_manager.getMetricDistance(graphs[index1], graphs[index2])) + " \n");
-
     }
-
 
     void writeApproximateDistanceBetweenGraph(std::vector<GraphData> graphs, int index1, int index2) {
-        write("Calculating approximate metric between graph "
-            + std::to_string(index1) + "(" + std::to_string(graphs.at(index1).getNodesCount()) + ")" + " and graph "
-            + std::to_string(index2) + "(" + std::to_string(graphs.at(index2).getNodesCount()) + ")\n");
-
         write("Approximate metric distance between graphs "
-            + std::to_string(graphs[index1].getId()) + " and " + std::to_string(graphs[index2].getId()) 
-            +".\nThe result is "
+            + std::to_string(graphs[index1].getId()) + " and " + std::to_string(graphs[index2].getId()) + ": "
             + std::to_string(graph_manager.tryGetMetricDistance(graphs[index1], graphs[index2])) + " \n");
     }
-
-    void writeGraphsIndiciesWithSizes(std::vector<GraphData> graphs) {
-
-        write("List of available graphs loaded from data files, the output format is: index(size)\n");
-        int index = 0;
-        for (auto& graph : graphs) {
-            write(std::to_string(index++) + "(" + std::to_string(graph.getNodesCount()) + ") ");
-        }
-        write("\n");
-    }
-
 
 private:
     GraphManager graph_manager;

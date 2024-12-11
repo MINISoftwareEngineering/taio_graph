@@ -73,46 +73,123 @@ void AppController::run(ProgramCommand command, RunData& data)
 #endif
 
 	std::string line = "x";
-	int index1 = 0;
-	int index2 = 1;
 
-	console_manager.write("Enter S to skip metric \n");
+	console_manager.write("Enter S to skip metric caculation stage(or enter to proceed)\n");
 	line = input_manager.readLineFromStdin();
 	if (line != "S")
 	{
+		console_manager.clear();
 		line = "R";
-		while (line == "R") {
-			console_manager.write("Select graph indices for metric calculations\n");
-			console_manager.write("enter R to calculate metric again for new indices\n");
+		while (line == "R" || line == "r") {
+			console_manager.write("Select graph indices for metric calculations (indices separted by space or enter)\n");
+			console_manager.write("Don't select graphs with size larger than 8 (computations will take too long)\n");
+			console_manager.writeGraphsIndiciesWithSizes(graphs_data);
+			std::pair<int, int> indices = getSelectedIndices(graphs_data);
+			if (graphs_data[indices.first].getNodesCount() > 8 
+				|| graphs_data[indices.second].getNodesCount() > 8) {
+				console_manager.write("Selected graph with size larger than 8 (computations would take too long)!\n");
+				console_manager.write("----- Try again -----\n");
+				continue;
+			}
+
+			console_manager.waitForEnter();
+			console_manager.writeDistanceBetweenGraphs(graphs_data, indices.first, indices.second);
+			console_manager.write("R to calculate metric again for new indices (press enter to go to the next stage)\n");
 			line = input_manager.readLineFromStdin();
 		}
+	}
+	console_manager.clear();
+	line = "x";
+
+	console_manager.write("Enter S to skip approximate metric caculation stage(or enter to proceed)\n");
+	line = input_manager.readLineFromStdin();
+	if (line != "S")
+	{
+		console_manager.clear();
+		line = "R";
+		while (line == "R" || line == "r") {
+			console_manager.write("Select graph indices for approximate metric calculations (indices separted by space or enter)\n");
+			console_manager.writeGraphsIndiciesWithSizes(graphs_data);
+			std::pair<int, int> indices = getSelectedIndices(graphs_data);
+
+			console_manager.waitForEnter();
+			console_manager.writeApproximateDistanceBetweenGraph(graphs_data, indices.first, indices.second);
+			console_manager.write("R to calculate approximate metric again for new indices (press enter to go to the next stage)\n");
+			line = input_manager.readLineFromStdin();
+		}
+	}
+	console_manager.clear();
+	line = "x";
+
+
+	console_manager.write("Enter S to skip finding all longest cycles (or enter to proceed) \n");
+	line = input_manager.readLineFromStdin();
+	if (line != "S")
+	{
+		console_manager.write("Finding all longest cycles...\n");
+		for (int i = 0; i < graphs_data.size(); ++i)
+		{
+			int nodeCount = graphs_data[i].getNodesCount();
+			if (nodeCount <= 8)
+			{
+				graph_manager.findLongestCycles(graphs_data[i]);
+				console_manager.write("|- graph " + std::to_string(i) + ": Finding finished! \n");
+			}
+			else
+				console_manager.write("|- graph " + std::to_string(i) + ": vertex count is larger than 8 - omitted (computations would take to long)! \n");
+		}
+		console_manager.clear();
+		console_manager.listLongestCycles(graphs_data);
 	}
 	line = "x";
 	console_manager.waitForEnter();
 
-	console_manager.write("Enter S to skip approximate metric \n");
+	console_manager.write("Enter S to skip finding approximate all longest cycles (or enter to proceed) \n");
 	line = input_manager.readLineFromStdin();
 	if (line != "S")
 	{
-		line = "R";
-		while (line == "R") {
-			console_manager.write("Select graph indices for approximate metric calculations\n");
-			index1 = input_manager.readNumber();
-			index2 = input_manager.readNumber();
-			console_manager.waitForEnter();
-			console_manager.writeApproximateDistanceBetweenGraph(graphs_data, index1, index2);
-			console_manager.write("enter R to calculate approximate metric again for new indices\n");
-			line = input_manager.readLineFromStdin();
+		console_manager.write("Finding approximate longest cycles...\n");
+		for (int i = 0; i < graphs_data.size(); ++i) {
+			graph_manager.tryFindLongestCycles(graphs_data[i]);
+			console_manager.write("|- graph " + std::to_string(i) + ": Approximate longest cycles found.\n");
 		}
+		console_manager.clear();
+		console_manager.listGraphsLongestCycles(graphs_data);
 	}
 	line = "x";
-	console_manager.waitForEnter();	
+	console_manager.waitForEnter();
 
-	console_manager.write("Enter S to skip finding approximate minimum extention to graph with Hamilton cycle \n");
+
+	console_manager.write("Enter S to skip finding all Hamilton cycles and minimum extensions (or enter to proceed) \n");
 	line = input_manager.readLineFromStdin();
 	if (line != "S")
 	{
-		console_manager.write("Enter retryFactor, or Enter for default value (10) \n");
+		console_manager.write("Finding all Hamilton cycles and minimum extensions...\n");
+		for (int i = 0; i < graphs_data.size(); ++i)
+		{
+			int nodeCount = graphs_data[i].getNodesCount();
+			if (nodeCount <= 8)
+			{
+				graph_manager.findHamiltonCycle(graphs_data[i]);
+				console_manager.write("|- graph " + std::to_string(i) + ": Finding finished! \n");
+			}
+			else
+				console_manager.write("|- graph " + std::to_string(i) + ": vertex count > 8 - omitted! \n");
+		}
+		console_manager.clear();
+		console_manager.listPreciseGraphsHamiltonCycleExtentions(graphs_data);
+	}
+	line = "x";
+	console_manager.waitForEnter();
+
+
+	console_manager.write("Enter S to skip finding approximate minimum extention to graph with Hamilton cycle (or enter to proceed) \n");
+	line = input_manager.readLineFromStdin();
+	if (line != "S")
+	{
+		console_manager.write("Enter retryFactor, or Enter for default value (10). \n");
+		console_manager.write("Minimum value is 1 and it is advised to enter values smaller than 16. \n");
+		console_manager.write("After entering retryFactor value, press enter. \n");
 		line = input_manager.readLineFromStdin();
 		int retry_factor = data.hamilton.approx.retry_factor;
 		if (line != "")
@@ -131,16 +208,9 @@ void AppController::run(ProgramCommand command, RunData& data)
 	}
 	console_manager.waitForEnter();
 
-	console_manager.write("Enter S to finding all longest cycles \n");
-	line = input_manager.readLineFromStdin();
-	if (line != "S")
-	{
-		console_manager.write("Finding all longest cycles...\n");
-		for (int i = 0; i < graphs_data.size(); ++i)
-			graph_manager.findLongestCycles(graphs_data[i]);
-	}
-	line = "x";
-    console_manager.waitForEnter();
+
+	console_manager.write("Program finished \n");
+
 }
 
 void AppController::run_hamilton_tests()
@@ -232,6 +302,40 @@ void AppController::run_metric_tests() {
 }
 
 
+std::pair<int, int> AppController::getSelectedIndices(std::vector<GraphData> graphs_data) {
+	int index1;
+	int index2;
+
+	bool selectIndex1 = true;
+	int indices_limit = graphs_data.size() - 1;
+	while (selectIndex1) {
+		index1 = input_manager.readNumber();
+
+		if (indices_limit < index1 || index1 < 0) {
+			console_manager.write("Select an index within provided range (0,"
+				+ std::to_string(indices_limit) + ")\n");
+		}
+		else {
+			selectIndex1 = false;
+		}
+	}
+
+	bool selectIndex2 = true;
+	while (selectIndex2) {
+		index2 = input_manager.readNumber();
+
+		if (indices_limit < index2 || index2 < 0) {
+			console_manager.write("Select an index within provided range (0,"
+				+ std::to_string(indices_limit) + ")\n");
+		}
+		else {
+			selectIndex2 = false;
+		}
+	}
+
+	return std::make_pair(index1, index2);
+
+
 void AppController::display_help() 
 {
 	std::string program_name = "taio_graph.exe";
@@ -251,4 +355,5 @@ void AppController::display_help()
 		<< "  " << program_name << " -s exact -f graph1.txt\n"
 		<< "  " << program_name << " -c both -f graph1.txt\n"
 		<< "  " << program_name << " -d both -f1 graph1.txt -f2 graph2.txt\n";
+
 }
