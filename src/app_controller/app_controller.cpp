@@ -7,7 +7,7 @@ void AppController::run(ProgramCommand command, RunData& data)
 		case CommandName::Help:
 		{
 			display_help();
-			return;
+			break;
 		}
 		case CommandName::Distance: {
 			if (!input_manager.inputFilesExist(command.files.at(0), command.files.at(1))) {
@@ -18,10 +18,26 @@ void AppController::run(ProgramCommand command, RunData& data)
 			GraphData graph1 = graph_data_loader.loadGraphFromFile(command.files.at(0));
 			GraphData graph2 = graph_data_loader.loadGraphFromFile(command.files.at(1));
 
+			console_manager.write("Macierz sasiedztwa 1\n");
+			console_manager.writeGraphInConsole(graph1);
+			console_manager.write("\n");
+
+			console_manager.write("Macierz sasiedztwa 2\n");
+			console_manager.writeGraphInConsole(graph2);\
+			console_manager.write("\n");
+
 			if (command.algorithm_type == AlgorithmType::Exact || command.algorithm_type == AlgorithmType::Both) {
-				console_manager.write("Obliczanie dokladnej metryki miedzy grafami...\n");
-				int distance = graph_manager.getMetricDistance(graph1, graph2);
-				console_manager.write("Dokladna metryka = " + std::to_string(distance) + " \n");
+				if (graph1.getNodesCount() <= 8 && graph2.getNodesCount() <= 8) {
+					console_manager.write("Obliczanie dokladnej metryki miedzy grafami...\n");
+					int distance = graph_manager.getMetricDistance(graph1, graph2);
+					console_manager.write("Dokladna metryka = " + std::to_string(distance) + " \n");
+				}
+				else {
+					console_manager.write("Obliczanie metryki dokladnej pominiete przez zbyt duzy rozmiar jednego z grafow.\n");
+					console_manager.write("Rozmiary to: \n\t" +
+						std::to_string(graph1.getNodesCount()) + " (wczytany z pliku " + command.files.at(0) + " )\n" +
+						"\t" + std::to_string(graph2.getNodesCount()) + " (wczytany z pliku " + command.files.at(1) + " )\n");
+				}
 			}
 
 			if (command.algorithm_type == AlgorithmType::Approximate || command.algorithm_type == AlgorithmType::Both)
@@ -31,7 +47,7 @@ void AppController::run(ProgramCommand command, RunData& data)
 				console_manager.write("Aproksymacja metryki = " + std::to_string(distance) + " \n");
 			}
 
-			return;
+			break;
 		}
 		case CommandName::Size:
 		{
@@ -45,23 +61,77 @@ void AppController::run(ProgramCommand command, RunData& data)
 			int size = graph_manager.getGraphSize(graph);
 			console_manager.write("Rozmiar grafu to = " + std::to_string(size) + "\n");
 
-			return;
+			break;
+		}
+		case CommandName::Hamilton: 
+		{
+			if (!input_manager.inputFileExists(command.files.at(0))) {
+				std::cerr << "Podany plik z danymi grafu nie zostal znaleziony" << std::endl;
+				std::cerr << "Podana sciezka to: " << command.files.at(0);
+				exit(EXIT_FAILURE);
+			}
+
+			GraphData graph = graph_data_loader.loadGraphFromFile(command.files.at(0));
+
+			if (command.algorithm_type == AlgorithmType::Exact || command.algorithm_type == AlgorithmType::Both) {
+				int nodeCount = graph.getNodesCount();
+				if (nodeCount <= 8)
+				{
+					graph_manager.findHamiltonCycle(graph);
+					console_manager.write("Finding finished! \n");
+					std::vector<GraphData> stub_vector = { graph };
+					console_manager.listPreciseGraphsHamiltonCycleExtentions(stub_vector);
+				}
+				else
+					console_manager.write("Vertex count > 8 - omitted! \n");
+			}
+
+			if (command.algorithm_type == AlgorithmType::Approximate || command.algorithm_type == AlgorithmType::Both) {
+				int retry_factor = 10;
+				if (!graph_manager.tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(graph, retry_factor))
+					console_manager.write("Finding failed! \n");
+				else
+					console_manager.write("Finding finished! \n");
+				console_manager.listGraphsHamiltonCycleExtentions(graphs_data);
+			}
+			break;
+		}
+		case CommandName::MaxCycles:
+		{
+			if (!input_manager.inputFileExists(command.files.at(0))) {
+				std::cerr << "Podany plik z danymi grafu nie zostal znaleziony" << std::endl;
+				std::cerr << "Podana sciezka to: " << command.files.at(0);
+				exit(EXIT_FAILURE);
+			}
+
+			GraphData graph = graph_data_loader.loadGraphFromFile(command.files.at(0));
+
+			console_manager.write("Finding all longest cycles...\n");
+			if (command.algorithm_type == AlgorithmType::Exact || command.algorithm_type == AlgorithmType::Both) {
+				if (graph.getNodesCount() <= 8) {
+					graph_manager.findLongestCycles(graph);
+					console_manager.write("Finding finished! \n");
+					std::vector<GraphData> stub_vector = { graph };
+					console_manager.listLongestCycles(stub_vector);
+				}
+				else
+					console_manager.write("Vertex count is larger than 8 - omitted (computations would take to long)! \n");
+			}
+
+
+			if (command.algorithm_type == AlgorithmType::Approximate || command.algorithm_type == AlgorithmType::Both)
+			{
+				console_manager.write("Finding approximate longest cycles...\n");
+				graph_manager.tryFindLongestCycles(graph);
+				console_manager.write("Approximate longest cycles found.\n");
+				std::vector<GraphData> stub_vector = { graph };
+				console_manager.listGraphsLongestCycles(stub_vector);
+			}
+			break;
 		}
 	}
 
 
-    console_manager.clear();
-    if (input_manager.inputFileExists())
-		console_manager.write("Input files detected\n");
-	else
-	{
-		console_manager.write("Create " INPUT_FOLDER_PATH " files\n");
-		console_manager.waitForEnter();
-	}
-
-    console_manager.write("Loading input...\n");
-    graph_data_loader.loadGraphsData(graphs_data);
-	console_manager.clear();
 
 #ifdef METRIC_TESTS
 	run_metric_tests();
@@ -71,146 +141,7 @@ void AppController::run(ProgramCommand command, RunData& data)
 #ifdef HAMILTON_TESTS
 	run_hamilton_tests();
 #endif
-
-	std::string line = "x";
-
-	console_manager.write("Enter S to skip metric caculation stage(or enter to proceed)\n");
-	line = input_manager.readLineFromStdin();
-	if (line != "S")
-	{
-		console_manager.clear();
-		line = "R";
-		while (line == "R" || line == "r") {
-			console_manager.write("Select graph indices for metric calculations (indices separted by space or enter)\n");
-			console_manager.write("Don't select graphs with size larger than 8 (computations will take too long)\n");
-			console_manager.writeGraphsIndiciesWithSizes(graphs_data);
-			std::pair<int, int> indices = getSelectedIndices(graphs_data);
-			if (graphs_data[indices.first].getNodesCount() > 8 
-				|| graphs_data[indices.second].getNodesCount() > 8) {
-				console_manager.write("Selected graph with size larger than 8 (computations would take too long)!\n");
-				console_manager.write("----- Try again -----\n");
-				continue;
-			}
-
-			console_manager.waitForEnter();
-			console_manager.writeDistanceBetweenGraphs(graphs_data, indices.first, indices.second);
-			console_manager.write("R to calculate metric again for new indices (press enter to go to the next stage)\n");
-			line = input_manager.readLineFromStdin();
-		}
-	}
-	console_manager.clear();
-	line = "x";
-
-	console_manager.write("Enter S to skip approximate metric caculation stage(or enter to proceed)\n");
-	line = input_manager.readLineFromStdin();
-	if (line != "S")
-	{
-		console_manager.clear();
-		line = "R";
-		while (line == "R" || line == "r") {
-			console_manager.write("Select graph indices for approximate metric calculations (indices separted by space or enter)\n");
-			console_manager.writeGraphsIndiciesWithSizes(graphs_data);
-			std::pair<int, int> indices = getSelectedIndices(graphs_data);
-
-			console_manager.waitForEnter();
-			console_manager.writeApproximateDistanceBetweenGraph(graphs_data, indices.first, indices.second);
-			console_manager.write("R to calculate approximate metric again for new indices (press enter to go to the next stage)\n");
-			line = input_manager.readLineFromStdin();
-		}
-	}
-	console_manager.clear();
-	line = "x";
-
-
-	console_manager.write("Enter S to skip finding all longest cycles (or enter to proceed) \n");
-	line = input_manager.readLineFromStdin();
-	if (line != "S")
-	{
-		console_manager.write("Finding all longest cycles...\n");
-		for (int i = 0; i < graphs_data.size(); ++i)
-		{
-			int nodeCount = graphs_data[i].getNodesCount();
-			if (nodeCount <= 8)
-			{
-				graph_manager.findLongestCycles(graphs_data[i]);
-				console_manager.write("|- graph " + std::to_string(i) + ": Finding finished! \n");
-			}
-			else
-				console_manager.write("|- graph " + std::to_string(i) + ": vertex count is larger than 8 - omitted (computations would take to long)! \n");
-		}
-		console_manager.clear();
-		console_manager.listLongestCycles(graphs_data);
-	}
-	line = "x";
-	console_manager.waitForEnter();
-
-	console_manager.write("Enter S to skip finding approximate all longest cycles (or enter to proceed) \n");
-	line = input_manager.readLineFromStdin();
-	if (line != "S")
-	{
-		console_manager.write("Finding approximate longest cycles...\n");
-		for (int i = 0; i < graphs_data.size(); ++i) {
-			graph_manager.tryFindLongestCycles(graphs_data[i]);
-			console_manager.write("|- graph " + std::to_string(i) + ": Approximate longest cycles found.\n");
-		}
-		console_manager.clear();
-		console_manager.listGraphsLongestCycles(graphs_data);
-	}
-	line = "x";
-	console_manager.waitForEnter();
-
-
-	console_manager.write("Enter S to skip finding all Hamilton cycles and minimum extensions (or enter to proceed) \n");
-	line = input_manager.readLineFromStdin();
-	if (line != "S")
-	{
-		console_manager.write("Finding all Hamilton cycles and minimum extensions...\n");
-		for (int i = 0; i < graphs_data.size(); ++i)
-		{
-			int nodeCount = graphs_data[i].getNodesCount();
-			if (nodeCount <= 8)
-			{
-				graph_manager.findHamiltonCycle(graphs_data[i]);
-				console_manager.write("|- graph " + std::to_string(i) + ": Finding finished! \n");
-			}
-			else
-				console_manager.write("|- graph " + std::to_string(i) + ": vertex count > 8 - omitted! \n");
-		}
-		console_manager.clear();
-		console_manager.listPreciseGraphsHamiltonCycleExtentions(graphs_data);
-	}
-	line = "x";
-	console_manager.waitForEnter();
-
-
-	console_manager.write("Enter S to skip finding approximate minimum extention to graph with Hamilton cycle (or enter to proceed) \n");
-	line = input_manager.readLineFromStdin();
-	if (line != "S")
-	{
-		console_manager.write("Enter retryFactor, or Enter for default value (10). \n");
-		console_manager.write("Minimum value is 1 and it is advised to enter values smaller than 16. \n");
-		console_manager.write("After entering retryFactor value, press enter. \n");
-		line = input_manager.readLineFromStdin();
-		int retry_factor = data.hamilton.approx.retry_factor;
-		if (line != "")
-		{
-			retry_factor = std::stoi(line);
-		}
-
-		console_manager.write("Finding minimum extentions with retry factor=" + std::to_string(retry_factor) + "...\n");
-		for (int i = 0; i < graphs_data.size(); ++i)
-			if (!graph_manager.tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(graphs_data[i], retry_factor))
-				console_manager.write("|- graph " + std::to_string(i) + ": Finding failed! \n");
-			else
-				console_manager.write("|- graph " + std::to_string(i) + ": Finding finished! \n");
-		console_manager.clear();
-		console_manager.listGraphsHamiltonCycleExtentions(graphs_data);
-	}
-	console_manager.waitForEnter();
-
-
-	console_manager.write("Program finished \n");
-
+	console_manager.waitForEnterToClose();
 }
 
 void AppController::run_hamilton_tests()
@@ -334,6 +265,7 @@ std::pair<int, int> AppController::getSelectedIndices(std::vector<GraphData> gra
 	}
 
 	return std::make_pair(index1, index2);
+}
 
 
 void AppController::display_help() 

@@ -763,9 +763,6 @@ int GraphManager::getEditDistance(GraphData graph_1, GraphData graph_2, int size
 
 #pragma region metricApproximation
 int GraphManager::tryGetMetricDistance(GraphData graph_1, GraphData graph_2) {
-	sortGraph(graph_1);
-	sortGraph(graph_2);
-
 	GraphData larger_graph = graph_1;
 	GraphData smaller_graph = graph_2;
 
@@ -778,7 +775,10 @@ int GraphManager::tryGetMetricDistance(GraphData graph_1, GraphData graph_2) {
 	int size_difference = larger_graph.getNodesCount() - smaller_graph.getNodesCount();
 	smaller_graph.setNodesCount(larger_graph.getNodesCount());
 
-	return getEditDistance(graph_1, graph_2, size_difference);
+	sortGraph(larger_graph);
+	sortGraph(smaller_graph);
+
+	return getEditDistance(smaller_graph, larger_graph, size_difference);
 }
 
 void GraphManager::sortGraph(GraphData& graph)
@@ -788,18 +788,17 @@ void GraphManager::sortGraph(GraphData& graph)
 		nodes.push_back(i);
 	}
 
-
-	std::stable_sort(nodes.begin(), nodes.end(), [&graph](int a, int b) {
-		size_t out_edges_a = graph.out_edges_by_node[a].size();
-		size_t out_edges_b = graph.out_edges_by_node[b].size();
-		return out_edges_a > out_edges_b;
-		});
-
-	std::stable_sort(nodes.begin(), nodes.end(), [&graph](int a, int b) {
+	std::sort(nodes.begin(), nodes.end(), [&graph](int a, int b) {
 		size_t in_edges_a = graph.in_edges_by_node[a].size();
 		size_t in_edges_b = graph.in_edges_by_node[b].size();
-		return in_edges_a > in_edges_b;
-		});
+		size_t out_edges_a = graph.out_edges_by_node[a].size();
+		size_t out_edges_b = graph.out_edges_by_node[b].size();
+
+		if (in_edges_a != in_edges_b) {
+			return in_edges_a > in_edges_b;
+		}
+		return out_edges_a > out_edges_b;
+	});
 
 	std::unordered_map<int, std::unordered_set<int>> sorted_out_edges;
 	std::unordered_map<int, std::unordered_set<int>> sorted_in_edges;

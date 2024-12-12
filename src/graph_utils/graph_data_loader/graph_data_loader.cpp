@@ -12,13 +12,14 @@ void GraphsDataLoader::loadGraphData(InputManager& input_manager, GraphData& gra
     graph_data.initialized = true;
     graph_data.nodes_count = nodes_count;
     //graph_data.relation_matrix = std::vector(nodes_count, std::vector<bool>(nodes_count, false));
-
     for (int row = 0; row < nodes_count; ++row) // out_node idx
     {
         input_manager.readLine(line);
             
         std::istringstream stream(line);
         bool value;
+
+        graph_data.adjacency_matrix_representation.push_back(std::vector<int>(nodes_count, 0));
 
         for (int col = 0; col < nodes_count; ++col) // in_node idx
         {
@@ -30,6 +31,8 @@ void GraphsDataLoader::loadGraphData(InputManager& input_manager, GraphData& gra
             
             graph_data.out_edges_by_node[row].insert(col);
             graph_data.in_edges_by_node[col].insert(row);
+
+            graph_data.adjacency_matrix_representation.at(row).at(col) = 1;
 
             // TO CONSIDER: if you know that node x has 0 out_edges it means that x is a leaf node for any in_edges. 
             // this fact later means that those in_edges are useless and you can get stop adding them in result, because they can't belong to any cycle.

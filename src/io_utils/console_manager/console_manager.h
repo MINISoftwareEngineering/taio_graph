@@ -64,9 +64,14 @@ struct ConsoleManager
 
     void waitForEnter()
     {
-            std::cout << "[Press Enter to continue] \n";
+            std::cout << "Nacisnij enter, aby kontynuowac...";
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            clear();
+    }
+
+    void waitForEnterToClose()
+    {
+        std::cout << "Nacisnij enter, aby zakonczyc...";
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
     void listGraphsSizes(std::vector<GraphData>& graphs_data)
@@ -270,7 +275,17 @@ struct ConsoleManager
         write("\n");
     }
 
-
+    void writeGraphInConsole(GraphData graph) 
+    {
+        for (auto& row : graph.adjacency_matrix_representation) {
+            std::cout << "[";
+            for (auto value : row) {
+                std::cout << value << " ";
+            }
+            std::cout << "]";
+            std:: cout << std::endl;
+        }
+    }
 private:
     GraphManager graph_manager;
 };

@@ -5,6 +5,7 @@ struct GraphData
 {
 #pragma region general
 public:
+    std::vector<std::vector<int>> adjacency_matrix_representation;
     std::unordered_map<int, std::unordered_set<int>> out_edges_by_node;
     std::unordered_map<int, std::unordered_set<int>> in_edges_by_node;
 
