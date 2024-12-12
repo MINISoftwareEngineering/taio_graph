@@ -151,6 +151,7 @@ struct ConsoleManager
         }
     }
 
+
     void listLongestCycles(std::vector<GraphData>& graphs_data)
     {
         write("Longest cycles: \n");
@@ -248,6 +249,7 @@ struct ConsoleManager
             + std::to_string(graph_manager.getMetricDistance(graphs[index1], graphs[index2])) + " \n");
 
     }
+
 
     void writeApproximateDistanceBetweenGraph(std::vector<GraphData> graphs, int index1, int index2) {
         write("Calculating approximate metric between graph "
