@@ -47,6 +47,31 @@ ProgramCommand ArgsParser::parse(int argc, char** argv) {
 		arguments.insert({ flag, value });
 	}
 
+	auto short_output_flag = arguments.find("-o");
+	auto long_output_flag = arguments.find("--output");
+
+	if (short_output_flag == arguments.end() && long_output_flag == arguments.end()) {
+		command.long_output = true; // by default long output
+	}
+	else if (short_output_flag != arguments.end()) {
+		if (short_output_flag->second == "short") {
+			command.long_output = false;
+		}
+		else
+		{
+			command.long_output = true;
+		}
+	}
+	else {
+		if (long_output_flag->second == "short") {
+			command.long_output = false;
+		}
+		else
+		{
+			command.long_output = true;
+		}
+	}
+
 
 	if (command.command_name == CommandName::Distance) {
 		auto file1 = arguments.find("-f1");

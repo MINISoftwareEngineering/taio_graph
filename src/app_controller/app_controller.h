@@ -23,6 +23,10 @@ struct AppController
     void run_metric_tests();
     void run_hamilton_tests();
     void display_help();
+    void distance(ProgramCommand command);
+    void size(ProgramCommand command);
+    void max_cycles(ProgramCommand command);
+    void hamilton(ProgramCommand command);
 private:
     InputManager input_manager;
     ConsoleManager console_manager;

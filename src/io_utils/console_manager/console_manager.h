@@ -183,12 +183,6 @@ struct ConsoleManager
                         printCycle(first_longest_cycle);
                         write("\n");
                     }
-
-                    //std::string full_execution_time = std::to_string(graph_data.findMinimumExtentionForHamiltonCycleExecutionTimeMs + graph_data.findAllHamiltonCyclesExecutionTimeMs);
-                    //std::string find_cycles_execution_time = std::to_string(graph_data.findAllHamiltonCyclesExecutionTimeMs);
-                    //std::string find_extention_execution_time = std::to_string(graph_data.findMinimumExtentionForHamiltonCycleExecutionTimeMs);
-                    //write("|  |- finding full solution time: " + full_execution_time + " ms  (finding minumum graph: " + find_extention_execution_time + " ms, finding hamilton cycles: " + find_cycles_execution_time + " ms) \n");
-                    
                 }
                 else
                     write("|- graph " + std::to_string(i) + ": Finding failed \n");
@@ -284,6 +278,40 @@ struct ConsoleManager
             }
             std::cout << "]";
             std:: cout << std::endl;
+        }
+    }
+    void writeCycleOnGraph(GraphData graph, std::vector<int> cycle) 
+    {
+        // Get the size of the adjacency matrix
+        int n = graph.adjacency_matrix_representation.size();
+
+        // Create a copy of the adjacency matrix for modification (printing only)
+        std::vector<std::vector<std::string>> formatted_matrix(n, std::vector<std::string>(n, ""));
+
+        // Populate the formatted_matrix with original values
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
+                formatted_matrix[i][j] = std::to_string(graph.adjacency_matrix_representation[i][j]);
+            }
+        }
+
+        // Highlight the edges of the cycle in the formatted matrix
+        for (size_t i = 0; i < cycle.size(); ++i) {
+            int from = cycle[i];
+            int to = cycle[(i + 1) % cycle.size()]; // Wrap around to form a cycle
+
+            if (graph.adjacency_matrix_representation[from][to] != 0) {
+                formatted_matrix[from][to] = "(" + formatted_matrix[from][to] + ")";
+            }
+        }
+
+        // Print the formatted matrix
+        std::cout << "Macierz sasiedztwa z zaznaczonym cyklem:\n";
+        for (const auto& row : formatted_matrix) {
+            for (const auto& cell : row) {
+                std::cout << cell << " ";
+            }
+            std::cout << "\n";
         }
     }
 private:

@@ -11,6 +11,7 @@ class ProgramCommand {
 public:
 	CommandName command_name;
 	AlgorithmType algorithm_type;
+	bool long_output;
 	std::vector<std::string> files;
 };
 
