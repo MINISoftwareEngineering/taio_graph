@@ -1,12 +1,71 @@
-From EXE:
-Copy desired data to Exe/resources/input folder from Examples folder.
-The order of input files determines ids of graphs, first file will start assigning indexes from 0, next file will assign next free index and so on.
-Run executable file from Exe folder.
+This file contains instructions how to compile, run and properly use the delivered program.
 
-From Source:
-Copy desired data to Source/resources/input folder.
-Open Source folder with source in Visual Studio, open CMakeLists.txt and press Ctrl + S. Then select taio_graph.exe as startup project and compile & run it. After creating exe file you can run it from Visual Studio or you can open taio_graph.exe file in taio_graph/out/build/x64-Debug folder.
+----------Input data:----------
+The program accepts input graphs from text files.
+In the first line every file should contain the number of graphs in the file. 
+For every graph the first line should determine the number n of vertices. Then the following n lines should provide the adjacency matrix of the graph. 
+Each line should contain values 1 (when there is an edge between corresponding coordinates) and 0 (when there is no edge) and they should be delimited by space.
 
-You also need to copy resources folder to the same location where executable file is located, executable and resources can be moved to other folders.
+The program can be either started from Exe/taio_graph.exe executable file or compiled from the Source folder. Both methods are described below.
 
+----------Start from executable file:----------
+The input text files in the format described above should be placed in the Exe/resources/input folder.
+Example input text files are located in Example folder, at least one file needs to be placed in the folder mentioned above.
+The program accepts multiple text files, each of them shall be loaded in alphabetical order by the program.
+The order of input files determines indexes of graphs, graphs in the first file will have assigned indexes starting from 0, graphs in the following files will be assigned starting from the first free index.
+In order to start the program, run executable file from Exe folder.
+
+----------Compile and start from Source folder:----------
+The input text files in the format described above should be placed in the Source/resources/input folder (create them if they don't exist).
+The program accepts multiple text files, each of them shall be loaded in alphabetical order by the program.
+The order of input files determines indexes of graphs, graphs in the first file will have assigned indexes starting from 0, graphs in the following files will be assigned starting from the first free index.
+To open, right click on the Source folder, choose source and select Visual Studio.
+Find the CMakeLists.txt file and press Ctrl + S. Then select taio_graph.exe as startup project and compile & run it. 
+After creating executable file you can run it from Visual Studio or you can open taio_graph.exe file in taio_graph/out/build/x64-Debug folder.
+You also need to copy Source/resources folder to the same location where executable file is located, both executable and resources can be moved to other folders.
 By default project is compiled in a release mode.
+
+
+----------Using the program:----------
+The program contains 6 sections in the order as below, each of them can be skipped by inputting S from the keyboard.
+
+1. Metric distance between graphs: precise algorithm
+In order to calculate the precise metric distance, the user should input indexes of two graphs to compare (indexing method is described in the Input data section). They should be delimited by space or enter.
+The accurate algorithm won't allow performing calculations on graphs larger than size 8 (that is because it was found experimentally that for graphs of size 9 the time to execute exceeded more than 5 minutes)
+After calculating, the program will display the metric distance.
+The user may restart this section by inputting R from the keyboard.
+Pressing enter will lead to the next section.
+
+2. Metric distance between graphs: approximate algorithm
+In order to calculate the approximate metric distance, the user should input indexes of two graphs to compare (indexing method is described in the Input data section). They should be delimited by space or enter.
+After calculating, the program will display the approximate metric distance.
+The user may restart this section by inputting R from the keyboard.
+Pressing enter will lead to the next section.
+
+3. Longest cycles: precise algorithm
+The program will iterate through each cycle loaded from the input text files and search for all the longest cycles in the graph.
+The loading screen will be displayed until all the results are calculated. Information for each graph should appear after calculating the result.
+Graphs with more than 8 vertices are omitted by the program, as the calculations for them take a significant amount of time. 
+After calculating all the results, the results for each graph will be displayed on the screen. They will contain information about the length of the longest cycle (or information that there are none) and the first of the longest cycles found.
+Pressing enter will lead to the next section.
+
+4. Longest cycles: approximate algorithm
+The program will iterate through each cycle loaded from the input text files and search for all the longest cycles in the graph.
+The loading screen will be displayed until all the results are calculated. Information for each graph should appear after calculating the result.
+After calculating all the results, the results for each graph will be displayed on the screen. They will contain information about the length of the longest cycle (or information that there are none) and the list of the longest cycles found.
+Pressing enter will lead to the next section.
+
+5. Hamilton cycles/smallest extensions to Hamilton cycle: precise algorithm
+The program will iterate through each cycle loaded from the input text files and search for all the Hamilton cycles in the graph or the smallest extension to Hamilton cycle.
+The loading screen will be displayed until all the results are calculated. Information for each graph should appear after calculating the result.
+Graphs with more than 8 vertices are omitted by the program, as the calculations for them take a significant amount of time. 
+After calculating all the results, the results for each graph will be displayed on the screen. They will contain information about the count of all Hamilton cycles (or the first of the smallest extensions if there aren't any Hamilton cycles found)
+Pressing enter will lead to the next section.
+
+6. Hamilton cycles/smallest extensions to Hamilton cycle: approximate algorithm
+The program will iterate through each cycle loaded from the input text files and search for the approximate smallest extension to Hamilton cycle and for the Hamilton cycles 
+in the graph. If finding Hamilton cycle required adding extension to the graph Hamilton cycles were searched in a graph extended with edges from approximate smallest extension that was just found.
+The loading screen will be displayed until all the results are calculated. Information for each graph should appear after calculating the result. 
+After calculating all the results, the results for each graph will be displayed on the screen. They will contain information about the count of found Hamilton cycles and the smallest approximate graph extension.
+Pressing enter will end the program.
+

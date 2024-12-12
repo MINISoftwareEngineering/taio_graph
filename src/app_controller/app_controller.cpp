@@ -20,7 +20,12 @@ void AppController::run(RunData& data)
 	run_metric_tests();
 #endif
 
-// #define HAMILTON_TESTS
+#define h_comparison
+#ifdef h_comparison
+	run_comparison_hamilton_tests();
+#endif
+
+#define HAMILTON_TESTS
 #ifdef HAMILTON_TESTS
 	run_hamilton_tests();
 #endif
@@ -166,6 +171,11 @@ void AppController::run(RunData& data)
 
 }
 
+void AppController::run_comparison_hamilton_tests()
+{
+
+}
+
 void AppController::run_hamilton_tests()
 {
 	int id_offset = 0;
@@ -174,10 +184,15 @@ void AppController::run_hamilton_tests()
 	std::string hamilton_tests_output = "hamilton_tests.csv";
 	createCSV(hamilton_tests_output);
 	std::vector<std::vector<std::string>> rows = { { "Approximate Extention", "Approximate Extention Size" , "Approximate Cycles Count", "Approximate Extention Time", "Approximate Cycles Time", "Approximate Full Time", "Graph Size", "Vertices Count", "Retry Factor"}};
-	for (int retry_factor = 1; retry_factor <= 17; retry_factor += 4)
+	int retries[3] = { 2, 5, 10 };
+
+	for (int j = 0; j < 3; j++)
 	{
+		int retry_factor = retries[j];
 		for (int i = 0; i < hamilton_tests_graphs.size(); ++i)
 		{
+			
+
 			int time_of_approximate = 0;
 			int approximate = measure_execution_time(
 				time_of_approximate,
@@ -205,6 +220,7 @@ void AppController::run_hamilton_tests()
 			};
 
 			rows.push_back(row);
+			std::cout << "retryf: " + std::to_string(retry_factor) + " size: " + std::to_string(hamilton_tests_graphs[i].getNodesCount()) + " time: " + std::to_string(time_of_approximate) + "\n";
 		}
 	}
 

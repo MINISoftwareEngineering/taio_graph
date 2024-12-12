@@ -21,6 +21,7 @@ struct AppController
     void run(RunData& data);
     void run_metric_tests();
     void run_hamilton_tests();
+    void run_comparison_hamilton_tests();
 
 private:
     InputManager input_manager;

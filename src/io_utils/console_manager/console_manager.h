@@ -136,10 +136,13 @@ struct ConsoleManager
                 std::string full_execution_time = std::to_string(graph_data.findMinimumExtentionForHamiltonCycleExecutionTimeMs + graph_data.findAllHamiltonCyclesExecutionTimeMs);
                 std::string find_cycles_execution_time = std::to_string(graph_data.findAllHamiltonCyclesExecutionTimeMs);
                 std::string find_extention_execution_time = std::to_string(graph_data.findMinimumExtentionForHamiltonCycleExecutionTimeMs);
+                std::string note = "";
+                if (graph_data.getHamiltonCycleGraphExtentionSize() > 0)
+                    note = " (for graph combined with smallest extention)";
 
                 write("|- graph " + std::to_string(i) + ": \n");
                 write("|  |- finding full solution time: " + full_execution_time + " ms  (finding minumum graph: " + find_extention_execution_time + " ms, finding hamilton cycles: " + find_cycles_execution_time + " ms) \n");
-                write("|  |- hamilton cycles: " + hamilton_cycles_count + " \n");
+                write("|  |- hamilton cycles" + note + ": " + hamilton_cycles_count + " \n");
                 write("|  |- smallest extention (edges count: " + std::to_string(graph_data.getHamiltonCycleGraphExtentionSize()) + "): \n");
                 write(graph_data.getHamiltonCycleGraphExtention());
             }
@@ -187,7 +190,6 @@ struct ConsoleManager
                 else
                     write("|- graph " + std::to_string(i) + ": Finding failed \n");
             }
-
         }
     }
 
