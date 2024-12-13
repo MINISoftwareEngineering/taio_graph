@@ -8,16 +8,17 @@ struct GraphManager
 #pragma region general
 public:
 	int getGraphSize(GraphData& graph_data);
+	bool hasEdge(GraphData& graph_data, int start_node, int end_node);
+	void addEdge(GraphData& graph_data, edge new_edge);
 private:
 	int getEdgesDensity(GraphData& graph_data);
 	void transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& graph_data);
-	void addEdge(GraphData& graph_data, edge new_edge);
 	bool isNodeWithoutOutEdges(GraphData& graph_data, int node_row);
 	bool isNodeWithoutInEdges(GraphData& graph_data, int node_col);
 	void removeOutEdges(GraphData& graph_data, int node);
 	void removeInEdges(GraphData& graph_data, int node);
 	bool tryGetRandomNode(int nodes_count, int& random_node);
-	bool hasEdge(GraphData& graph_data, int start_node, int end_node);
+	
 public:
 	void generateGraphPermutations(GraphData& graph_data, std::function<bool(GraphData)> callback);
 #pragma endregion

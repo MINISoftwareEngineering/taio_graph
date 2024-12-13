@@ -67,12 +67,12 @@ void AppController::run(ProgramCommand command, RunData& data)
 	run_metric_tests();
 #endif
 
-#define h_comparison
+// #define h_comparison
 #ifdef h_comparison
 	run_comparison_hamilton_tests();
 #endif
 
-#define HAMILTON_TESTS
+// #define HAMILTON_TESTS
 #ifdef HAMILTON_TESTS
 	run_hamilton_tests();
 #endif
@@ -188,13 +188,13 @@ void AppController::run(ProgramCommand command, RunData& data)
 	console_manager.waitForEnter();
 
 
-	console_manager.write("Enter S to skip finding approximate minimum extention to graph with Hamilton cycle (or enter to proceed) \n");
+	console_manager.write("Naciśnij S aby pominąć wykonanie aproksymacyjnego algorytmu znajdującego \nnajmniejsze rozszerzenie grafu do grafu zawierającego cykl Hamiltona \noraz liczbę cykli Hamiltona (lub naciśnij Enter aby wykonać) \n");
 	line = input_manager.readLineFromStdin();
 	if (line != "S")
 	{
-		console_manager.write("Enter retryFactor, or Enter for default value (10). \n");
-		console_manager.write("Minimum value is 1 and it is advised to enter values smaller than 16. \n");
-		console_manager.write("After entering retryFactor value, press enter. \n");
+		console_manager.write("Wprowadź wartość dla parametru retryFactor lub naciśnij enter dla domyślnej wartości (10). \n");
+		console_manager.write("Najmniejsza poprawna wartość to 1, zalecane wprowadzanie wartości mniejszych niż 16 \n");
+		console_manager.write("Po wprowadzeniu wartości retryFactor naciśnij enter. \n");
 		line = input_manager.readLineFromStdin();
 		int retry_factor = data.hamilton.approx.retry_factor;
 		if (line != "")
@@ -350,6 +350,7 @@ std::pair<int, int> AppController::getSelectedIndices(std::vector<GraphData> gra
 	}
 
 	return std::make_pair(index1, index2);
+}
 
 
 void AppController::display_help() 
