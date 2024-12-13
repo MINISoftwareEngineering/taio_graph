@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <config.h>
 #include <graph_manager/graph_manager.h>
 #include <limits>
@@ -10,21 +10,21 @@ inline std::ostream& operator<<(std::ostream& os, const graph_extention_t& exten
 {
     if (extention.empty())
     {
-        os << "|  |   [] \n";
+        os << "|   [] \n";
         return os;
     }
 
     int i = 0;
-    os << "|  |   [ ";
+    os << "|   [ ";
     for each (edge e in extention)
     {
         if (i % 6 == 0)
-            os << "\n|  |     ";
+            os << "\n|     ";
         os << e.start << " -> " << e.end;
         if (i++ != extention.size() - 1)
             os << ", ";
     }
-    os << "\n|  |   ] \n";
+    os << "\n|   ] \n";
     return os;
 }
 
@@ -34,8 +34,9 @@ inline std::ostream& operator<<(std::ostream& os, const path_t& path)
     for (size_t i = 0; i < path.size(); ++i)
     {
         os << path[i];
-        if (i != path.size() - 1)
-            os << " -> ";
+        os << " -> ";
+        if (i == path.size() - 1)
+            os << path[0];
     }
     os << " ]";
     return os;
@@ -124,6 +125,127 @@ struct ConsoleManager
             }
             
         }
+    }
+
+    void writeGraphHamiltonCycleExtention(GraphData& graph_data)
+    {
+        //write("Aproksymacja algorytmu znajdującego \nminimalne rozszerzenie grafu do grafu zawierającego cykl Hamiltona \noraz liczbę cykli Hamiltona: \n");
+
+        if (graph_data.isHamiltonCycleGraphExtentionAssigned())
+        {
+            int graph_size = graph_manager.getGraphSize(graph_data);
+
+            std::string hamilton_cycles_count = std::to_string(graph_data.getHamiltonCycles().size());
+            std::string full_execution_time = std::to_string(graph_data.findMinimumExtentionForHamiltonCycleExecutionTimeMs + graph_data.findAllHamiltonCyclesExecutionTimeMs);
+            std::string find_cycles_execution_time = std::to_string(graph_data.findAllHamiltonCyclesExecutionTimeMs);
+            std::string find_extention_execution_time = std::to_string(graph_data.findMinimumExtentionForHamiltonCycleExecutionTimeMs);
+            std::string note = "";
+            if (graph_data.getHamiltonCycleGraphExtentionSize() > 0)
+                note = " (dla grafu z dodanymi krawędzami z najmniejszego rozszerzenia)";
+
+            write("Wyniki: \n");
+
+            /*if (graph_data.getNodesCount() <= 32)
+            {
+
+
+                write("|  |- macierz sąsiedztwa: \n");
+
+                for (int j = 0; j < graph_data.getNodesCount(); j++)
+                {
+                    write("|  |   [");
+                    for (int k = 0; k < graph_data.getNodesCount(); k++)
+                    {
+                        if (graph_manager.hasEdge(graph_data, j, k))
+                        {
+                            write(" 1 ");
+                        }
+                        else write(" 0 ");
+                    }
+                    write("] \n");
+                }
+            }
+            else
+                write("|  |- macierz sąsiedztwa: (nie wyświetlona, za dużo wierzchołków) \n");*/
+
+            write("|- czas szukania wyniku: " + full_execution_time + " ms  (minimalne rozszerzenie: " + find_extention_execution_time + " ms, liczba cykli: " + find_cycles_execution_time + " ms) \n");
+
+            write("|- najmniejsze rozszerzenie (liczba krawędzi: " + std::to_string(graph_data.getHamiltonCycleGraphExtentionSize()) + "): \n");
+            write(graph_data.getHamiltonCycleGraphExtention());
+
+            GraphData graph_data_ex = graph_data;
+            if (graph_data.getNodesCount() <= 32)
+            {
+                write("|  rozszerzenie zaznaczone na macierzy sąsiedztwa: \n");
+
+
+                for each (edge e in graph_data_ex.getHamiltonCycleGraphExtention())
+                {
+                    graph_manager.addEdge(graph_data_ex, e);
+                }
+
+                for (int j = 0; j < graph_data.getNodesCount(); j++)
+                {
+                    write("|   [");
+                    for (int k = 0; k < graph_data_ex.getNodesCount(); k++)
+                    {
+                        if (graph_manager.hasEdge(graph_data, j, k))
+                        {
+                            write(" 1 ");
+                        }
+                        else if (graph_manager.hasEdge(graph_data_ex, j, k))
+                        {
+                            write("(1)");
+                        }
+                        else write(" 0 ");
+                    }
+                    write("] \n");
+                }
+            }
+            else
+                write("|  rozszerzenie zaznaczone na macierzy sąsiedztwa: (nie wyświetlone, za dużo wierzchołków) \n");
+
+            write("|- liczba cykli hamiltona" + note + ": " + hamilton_cycles_count + " \n");
+
+            if (graph_data.getNodesCount() <= 32)
+            {
+                write("|  cykle zaznaczone na macierzy sądziedztwa: \n");
+
+                int c = 1;
+                for each (path_t cycle in graph_data.getHamiltonCycles())
+                {
+                    write("|  |- cykl " + std::to_string(c++) + ": ");
+                    std::cout << cycle;
+                    write("\n");
+                    for (int j = 0; j < graph_data.getNodesCount(); j++)
+                    {
+                        write("|  |  |   [");
+                        for (int k = 0; k < graph_data.getNodesCount(); k++)
+                        {
+                            if (graph_manager.hasEdge(graph_data_ex, j, k))
+                            {
+                                auto it = std::find(cycle.begin(), cycle.end(), j);
+                                int index = std::distance(cycle.begin(), it);
+
+                                if (cycle[(index + 1) % graph_data.getNodesCount()] == k)
+                                    write("(1)");
+                                else
+                                    write(" 1 ");
+                            }
+                            else
+                                write(" 0 ");
+                        }
+                        write("] \n");
+                    }
+                }
+            }
+            else
+                write("|  cykle zaznaczone na macierzy sądziedztwa: (nie wyświetlone, za dużo wierzchołków) \n");
+
+        }
+        else
+            write("Wyniki: Wykonanie nie powiodło się \n");
+    
     }
 
     void listGraphsHamiltonCycleExtentions(std::vector<GraphData>& graphs_data)
@@ -274,7 +396,7 @@ struct ConsoleManager
         for (auto& row : graph.adjacency_matrix_representation) {
             std::cout << "[";
             for (auto value : row) {
-                std::cout << value << " ";
+                std::cout << " " << value << " ";
             }
             std::cout << "]";
             std:: cout << std::endl;
