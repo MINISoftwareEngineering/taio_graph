@@ -430,9 +430,14 @@ struct ConsoleManager
         // Print the formatted matrix
         std::cout << "Macierz sasiedztwa z zaznaczonym cyklem:\n";
         for (const auto& row : formatted_matrix) {
+            std::cout << "[";
             for (const auto& cell : row) {
-                std::cout << cell << " ";
+                if (cell.length() > 1)
+                    std::cout << cell;
+                else 
+                    std::cout << " " << cell << " ";
             }
+            std::cout << "]";
             std::cout << "\n";
         }
     }

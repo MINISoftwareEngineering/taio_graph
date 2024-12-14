@@ -198,6 +198,10 @@ void AppController::distance(ProgramCommand command)
 	GraphData graph1 = graph_data_loader.loadGraphFromFile(command.files.at(0));
 	GraphData graph2 = graph_data_loader.loadGraphFromFile(command.files.at(1));
 
+	console_manager.write("\n==========================================================\n");
+	console_manager.write("\tWyznaczanie odległosci miedzy grafami\n");
+	console_manager.write("==========================================================\n\n");
+
 	if (command.long_output) {
 		console_manager.write("Macierz sasiedztwa 1:\n");
 		console_manager.writeGraphInConsole(graph1);
@@ -236,17 +240,24 @@ void AppController::size(ProgramCommand command)
 		std::cerr << "Podany plik z danymi grafu, nie istnieje" << std::endl;
 	}
 
-	GraphData graph = graph_data_loader.loadGraphFromFile(command.files.at(0));
+	std::vector<GraphData> graphs = graph_data_loader.loadGraphsFromFile(command.files.at(0));
 
-	if (command.long_output) {
-		console_manager.write("Macierz sasiedztwa:\n");
-		console_manager.writeGraphInConsole(graph);
-		console_manager.write("\n");
+	for (int i = 0; i < graphs.size(); i++) {
+
+		console_manager.write("\n==========================================================\n");
+		console_manager.write("Wyznaczenie rozmiaru dla grafu nr " + std::to_string(i + 1) + "\n");
+		console_manager.write("==========================================================\n\n");
+
+		if (command.long_output) {
+			console_manager.write("Macierz sasiedztwa:\n");
+			console_manager.writeGraphInConsole(graphs.at(i));
+			console_manager.write("\n");
+		}
+
+		console_manager.write("Obliczanie rozmiaru grafu...\n");
+		int size = graph_manager.getGraphSize(graphs.at(i));
+		console_manager.write("Rozmiar grafu to = " + std::to_string(size) + "\n");
 	}
-
-	console_manager.write("Obliczanie rozmiaru grafu...\n");
-	int size = graph_manager.getGraphSize(graph);
-	console_manager.write("Rozmiar grafu to = " + std::to_string(size) + "\n");
 }
 
 void AppController::hamilton(ProgramCommand command)
@@ -257,36 +268,43 @@ void AppController::hamilton(ProgramCommand command)
 		exit(EXIT_FAILURE);
 	}
 
-	GraphData graph = graph_data_loader.loadGraphFromFile(command.files.at(0));
+	std::vector<GraphData> graphs = graph_data_loader.loadGraphsFromFile(command.files.at(0));
 
-	if (command.long_output) {
-		console_manager.write("Macierz sasiedztwa:\n");
-		console_manager.writeGraphInConsole(graph);
-		console_manager.write("\n");
-	}
+	for (int i = 0; i < graphs.size(); i++) {
 
-	if (command.algorithm_type == AlgorithmType::Exact || command.algorithm_type == AlgorithmType::Both) {
-		int nodeCount = graph.getNodesCount();
-		if (nodeCount <= 8)
-		{
-			console_manager.write("Dokladne wyznaczanie rozszerzenia hamiltonowskiego rozpoczete...\n");
-			graph_manager.findHamiltonCycle(graph);
-			console_manager.write("Wyznaczanie dokladne skonczone\n");
-			std::vector<GraphData> stub_vector = { graph };
-			console_manager.listPreciseGraphsHamiltonCycleExtentions(stub_vector);
+		console_manager.write("\n==========================================================\n");
+		console_manager.write("Znajdowanie rozszerzenia hamiltonowskiego dla grafu nr " + std::to_string(i + 1) + "\n");
+		console_manager.write("==========================================================\n\n");
+
+		if (command.long_output) {
+			console_manager.write("Macierz sasiedztwa:\n");
+			console_manager.writeGraphInConsole(graphs.at(i));
+			console_manager.write("\n");
 		}
-		else
-			console_manager.write("Dokladny algorytm pominiety, graf ma wiecej niz 8 wierzcholkow\n");
-	}
 
-	if (command.algorithm_type == AlgorithmType::Approximate || command.algorithm_type == AlgorithmType::Both) {
-		int retry_factor = 10;
-		console_manager.write("Aproksymacyjne wyznaczanie rozszerzenia hamiltonowskiego rozpoczete...\n");
-		if (!graph_manager.tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(graph, retry_factor))
-			console_manager.write("Nie udalo sie znalezc aproksymacji rozszerzenia hamiltonowskiego\n");
-		else
-			console_manager.write("Wyznaczenie aproksymacyjne udane\n");
-		console_manager.writeGraphHamiltonCycleExtention(graph);
+		if (command.algorithm_type == AlgorithmType::Exact || command.algorithm_type == AlgorithmType::Both) {
+			int nodeCount = graphs.at(i).getNodesCount();
+			if (nodeCount <= 8)
+			{
+				console_manager.write("Dokladne wyznaczanie rozszerzenia hamiltonowskiego rozpoczete...\n");
+				graph_manager.findHamiltonCycle(graphs.at(i));
+				console_manager.write("Wyznaczanie dokladne skonczone\n");
+				std::vector<GraphData> stub_vector = { graphs.at(i) };
+				console_manager.listPreciseGraphsHamiltonCycleExtentions(stub_vector);
+			}
+			else
+				console_manager.write("Dokladny algorytm pominiety, graf ma wiecej niz 8 wierzcholkow\n");
+		}
+
+		if (command.algorithm_type == AlgorithmType::Approximate || command.algorithm_type == AlgorithmType::Both) {
+			int retry_factor = 10;
+			console_manager.write("Aproksymacyjne wyznaczanie rozszerzenia hamiltonowskiego rozpoczete...\n");
+			if (!graph_manager.tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(graphs.at(i), retry_factor))
+				console_manager.write("Nie udalo sie znalezc aproksymacji rozszerzenia hamiltonowskiego\n");
+			else
+				console_manager.write("Wyznaczenie aproksymacyjne udane\n");
+			console_manager.writeGraphHamiltonCycleExtention(graphs.at(i));
+		}
 	}
 }
 
@@ -298,43 +316,51 @@ void AppController::max_cycles(ProgramCommand command)
 		exit(EXIT_FAILURE);
 	}
 
-	GraphData graph = graph_data_loader.loadGraphFromFile(command.files.at(0));
+	std::vector<GraphData> graphs = graph_data_loader.loadGraphsFromFile(command.files.at(0));
 
-	if (command.long_output) {
-		console_manager.write("Macierz sasiedztwa:\n");
-		console_manager.writeGraphInConsole(graph);
-		console_manager.write("\n");
-	}
+	for (int i = 0; i < graphs.size(); i++) {
 
-	console_manager.write("Finding all longest cycles...\n");
-	if (command.algorithm_type == AlgorithmType::Exact || command.algorithm_type == AlgorithmType::Both) {
-		if (graph.getNodesCount() <= 8) {
-			graph_manager.findLongestCycles(graph);
-			console_manager.write("Finding finished! \n");
-			std::vector<GraphData> stub_vector = { graph };
-			console_manager.listLongestCycles(stub_vector);
+		console_manager.write("\n================================================\n");
+		console_manager.write("Znajdowanie najwiekszych cykli dla grafu nr " + std::to_string(i + 1) + "\n");
+		console_manager.write("================================================\n\n");
 
-			if (command.long_output && !graph.getLongestCycles().empty()) {
-				auto cycle = graph.getLongestCycles().front();
-				console_manager.writeCycleOnGraph(graph, cycle);
-			}
+
+		if (command.long_output) {
+			console_manager.write("Macierz sasiedztwa:\n");
+			console_manager.writeGraphInConsole(graphs.at(i));
+			console_manager.write("\n");
 		}
-		else
-			console_manager.write("Vertex count is larger than 8 - omitted (computations would take to long)! \n");
-	}
+
+		if (command.algorithm_type == AlgorithmType::Exact || command.algorithm_type == AlgorithmType::Both) {
+			console_manager.write("Rozpoczeto dokladne znajodwanie najwiekszego cyklu...\n");
+			if (graphs.at(i).getNodesCount() <= 8) {
+				graph_manager.findLongestCycles(graphs.at(i));
+				console_manager.write("Najdluszy cykl znaleziony.\n");
+				std::vector<GraphData> stub_vector = { graphs.at(i) };
+				console_manager.listLongestCycles(stub_vector);
+
+				if (command.long_output && !graphs.at(i).getLongestCycles().empty()) {
+					auto cycle = graphs.at(i).getLongestCycles().front();
+					console_manager.writeCycleOnGraph(graphs.at(i), cycle);
+				}
+			}
+			else
+				console_manager.write("Vertex count is larger than 8 - omitted (computations would take to long)! \n");
+		}
 
 
-	if (command.algorithm_type == AlgorithmType::Approximate || command.algorithm_type == AlgorithmType::Both)
-	{
-		console_manager.write("Finding approximate longest cycles...\n");
-		graph_manager.tryFindLongestCycles(graph);
-		console_manager.write("Approximate longest cycles found.\n");
-		std::vector<GraphData> stub_vector = { graph };
-		console_manager.listGraphsLongestCycles(stub_vector);
+		if (command.algorithm_type == AlgorithmType::Approximate || command.algorithm_type == AlgorithmType::Both)
+		{
+			console_manager.write("Rozpoczeto aproksymacyjne znajodwanie najwiekszego cyklu...\n");
+			graph_manager.tryFindLongestCycles(graphs.at(i));
+			console_manager.write("Aproksymacja najdluzszego cyklu znaleziona.\n");
+			std::vector<GraphData> stub_vector = { graphs.at(i) };
+			console_manager.listGraphsLongestCycles(stub_vector);
 
-		if (command.long_output && !graph.getApproximateLongestCycles().empty()) {
-			auto cycle = graph.getApproximateLongestCycles().front();
-			console_manager.writeCycleOnGraph(graph, cycle);
+			if (command.long_output && !graphs.at(i).getApproximateLongestCycles().empty()) {
+				auto cycle = graphs.at(i).getApproximateLongestCycles().front();
+				console_manager.writeCycleOnGraph(graphs.at(i), cycle);
+			}
 		}
 	}
 }

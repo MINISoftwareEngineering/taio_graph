@@ -91,3 +91,17 @@ GraphData GraphsDataLoader::loadGraphFromFile(std::string file_path)
 
     return graphs.at(0);
 }
+
+std::vector<GraphData> GraphsDataLoader::loadGraphsFromFile(std::string file_path)
+{
+    std::vector<GraphData> graphs;
+    int id_offset = 0;
+    loadGraphsFromFileData(graphs, file_path, id_offset);
+
+    if (graphs.size() == 0) {
+        std::cerr << "No graphs were found in provided file" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    return graphs;
+}

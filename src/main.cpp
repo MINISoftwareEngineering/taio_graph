@@ -2,6 +2,8 @@
 #include <app_controller/app_controller.h>
 #include <args_parser.h>
 #include <program_commanmd.h>
+#include <locale>       // For locale settings
+#include <codecvt>      // For wide character conversion (if needed)
 
 int main(int argc, char** argv)
 {
