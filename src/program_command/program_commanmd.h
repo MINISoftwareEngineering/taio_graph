@@ -13,6 +13,7 @@ public:
 	AlgorithmType algorithm_type;
 	bool long_output;
 	std::vector<std::string> files;
+	int param;
 };
 
 #endif // ProgramCommand_h 

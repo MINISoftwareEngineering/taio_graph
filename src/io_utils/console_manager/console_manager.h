@@ -141,7 +141,7 @@ struct ConsoleManager
             std::string find_extention_execution_time = std::to_string(graph_data.findMinimumExtentionForHamiltonCycleExecutionTimeMs);
             std::string note = "";
             if (graph_data.getHamiltonCycleGraphExtentionSize() > 0)
-                note = " (dla grafu z dodanymi krawędzami z najmniejszego rozszerzenia)";
+                note = " (dla grafu z dodanymi krawedzami z najmniejszego rozszerzenia)";
 
             write("Wyniki: \n");
 
@@ -170,13 +170,13 @@ struct ConsoleManager
 
             write("|- czas szukania wyniku: " + full_execution_time + " ms  (minimalne rozszerzenie: " + find_extention_execution_time + " ms, liczba cykli: " + find_cycles_execution_time + " ms) \n");
 
-            write("|- najmniejsze rozszerzenie (liczba krawędzi: " + std::to_string(graph_data.getHamiltonCycleGraphExtentionSize()) + "): \n");
+            write("|- najmniejsze rozszerzenie (liczba krawedzi: " + std::to_string(graph_data.getHamiltonCycleGraphExtentionSize()) + "): \n");
             write(graph_data.getHamiltonCycleGraphExtention());
 
             GraphData graph_data_ex = graph_data;
             if (graph_data.getNodesCount() <= 32)
             {
-                write("|  rozszerzenie zaznaczone na macierzy sąsiedztwa: \n");
+                write("|  rozszerzenie zaznaczone na macierzy sasiedztwa: \n");
 
 
                 for each (edge e in graph_data_ex.getHamiltonCycleGraphExtention())
@@ -203,13 +203,13 @@ struct ConsoleManager
                 }
             }
             else
-                write("|  rozszerzenie zaznaczone na macierzy sąsiedztwa: (nie wyświetlone, za dużo wierzchołków) \n");
+                write("|  rozszerzenie zaznaczone na macierzy sasiedztwa: (nie wyswietlone, za duzo wierzchołkow) \n");
 
             write("|- liczba cykli hamiltona" + note + ": " + hamilton_cycles_count + " \n");
 
             if (graph_data.getNodesCount() <= 32)
             {
-                write("|  cykle zaznaczone na macierzy sądziedztwa: \n");
+                write("|  cykle zaznaczone na macierzy sadziedztwa: \n");
 
                 int c = 1;
                 for each (path_t cycle in graph_data.getHamiltonCycles())
@@ -240,11 +240,11 @@ struct ConsoleManager
                 }
             }
             else
-                write("|  cykle zaznaczone na macierzy sądziedztwa: (nie wyświetlone, za dużo wierzchołków) \n");
+                write("|  cykle zaznaczone na macierzy sadziedztwa: (nie wyswietlone, za duzo wierzcholkow) \n");
 
         }
         else
-            write("Wyniki: Wykonanie nie powiodło się \n");
+            write("Wyniki: Wykonanie nie powiodlo sie \n");
     
     }
 

@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 
 	AppController app_controller;
 	RunData run_data;
-	run_data.hamilton.approx.retry_factor = 10;
+	run_data.hamilton.approx.retry_factor = command.param;
 
 	app_controller.run(command, run_data);
 

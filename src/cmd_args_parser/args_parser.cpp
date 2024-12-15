@@ -96,6 +96,24 @@ ProgramCommand ArgsParser::parse(int argc, char** argv) {
 		command.files.push_back(file->second);
 	}
 
+	if (command.command_name == CommandName::Hamilton && command.algorithm_type != AlgorithmType::Exact)
+	{
+		int retryFactor = 10;
+		auto retryFactorArg = arguments.find("-r");
+
+		if (retryFactorArg != arguments.end())
+		{
+			retryFactor = std::stoi(retryFactorArg->second);
+
+			if (retryFactor < 1 || retryFactor > 15)
+			{
+				std::cerr << "Parametr retryFactor powinien posiadac wartosc wieksza od 0 i mniejsza od 16 (aby uzyskac rozsadny czas wykonania algorytmu), spodziewany format: -r [wartosc retryFactor]" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+		}
+		command.param = retryFactor;
+	}
+
 	return command;
 }
 

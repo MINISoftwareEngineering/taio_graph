@@ -178,6 +178,7 @@ void AppController::display_help()
 		<< std::setw(25) << std::left << "  -f, [nazwa_pliku]" << " dla opcji -h, -s, -c\n"
 		<< std::setw(25) << std::left << "  -f1 [nazwa_pliku1]" << " dla opcji -d\n"
 		<< std::setw(25) << std::left << "  -f2 [nazwa_pliku2]" << " dla opcji -d\n"
+		<< std::setw(25) << std::left << "  -r  [1-15]" << " dla opcji -h approx | both " << " postawowo 10\n"
 		<< std::setw(25) << std::left << "  -o, ---output  " << " long | short " << " podstawowo long\n\n"
 		<< "Przyklady:\n"
 		<< "  " << program_name << " --help\n"
@@ -277,6 +278,8 @@ void AppController::hamilton(ProgramCommand command)
 		console_manager.write("==========================================================\n\n");
 
 		if (command.long_output) {
+			if (command.algorithm_type == AlgorithmType::Approximate || command.algorithm_type == AlgorithmType::Both)	
+				
 			console_manager.write("Macierz sasiedztwa:\n");
 			console_manager.writeGraphInConsole(graphs.at(i));
 			console_manager.write("\n");
@@ -297,9 +300,13 @@ void AppController::hamilton(ProgramCommand command)
 		}
 
 		if (command.algorithm_type == AlgorithmType::Approximate || command.algorithm_type == AlgorithmType::Both) {
-			int retry_factor = 10;
+			std::string param_note = "";
+			if (command.param == 10)
+				param_note = " (wartosc domyslna)";
+
+			console_manager.write("\nParametr retryFactor dla algorytmu aproksymacyjnego: " + std::to_string(command.param) + param_note + "\n\n");
 			console_manager.write("Aproksymacyjne wyznaczanie rozszerzenia hamiltonowskiego rozpoczete...\n");
-			if (!graph_manager.tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(graphs.at(i), retry_factor))
+			if (!graph_manager.tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(graphs.at(i), command.param))
 				console_manager.write("Nie udalo sie znalezc aproksymacji rozszerzenia hamiltonowskiego\n");
 			else
 				console_manager.write("Wyznaczenie aproksymacyjne udane\n");
@@ -345,7 +352,7 @@ void AppController::max_cycles(ProgramCommand command)
 				}
 			}
 			else
-				console_manager.write("Vertex count is larger than 8 - omitted (computations would take to long)! \n");
+				console_manager.write("Dokladny algorytm pominiety, graf ma wiecej niz 8 wierzcholkow\n");
 		}
 
 
