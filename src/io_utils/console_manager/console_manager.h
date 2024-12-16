@@ -217,7 +217,11 @@ struct ConsoleManager
             {
                 if (graph_data.getNodesCount() <= 32)
                 {
-                    write("|  cykle zaznaczone na macierzy sadziedztwa: \n");
+                    std::string no_cycles = "";
+                    if (graph_data.getHamiltonCycles().size() == 0)
+                        no_cycles = "brak cykli ";
+
+                    write("|  cykle zaznaczone na macierzy sadziedztwa: " + no_cycles + "\n");
 
                     int c = 1;
                     for each (path_t cycle in graph_data.getHamiltonCycles())

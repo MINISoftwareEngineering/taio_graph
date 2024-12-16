@@ -554,6 +554,13 @@ bool GraphManager::tryGetRandomUnvisitedNode(int nodes_count, std::unordered_set
 
 bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data, int retry_factor)
 {
+	if (graph_data.getNodesCount() == 1)
+	{
+		graph_extention_t ext;
+		graph_data.setHamiltonCycleGraphExtention(ext);
+		return true;
+	}
+
 	int iterations = std::max(getEdgesDensity(graph_data), 1) * retry_factor;
 
 	for (int i = 0; i < iterations; ++i)
