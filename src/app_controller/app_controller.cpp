@@ -310,7 +310,7 @@ void AppController::hamilton(ProgramCommand command)
 				console_manager.write("Nie udalo sie znalezc aproksymacji rozszerzenia hamiltonowskiego\n");
 			else
 				console_manager.write("Wyznaczenie aproksymacyjne udane\n");
-			console_manager.writeGraphHamiltonCycleExtention(graphs.at(i));
+			console_manager.writeGraphHamiltonCycleExtention(graphs.at(i), command.long_output);
 		}
 	}
 }
