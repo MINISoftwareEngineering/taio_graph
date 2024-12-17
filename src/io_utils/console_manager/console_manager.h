@@ -290,20 +290,18 @@ struct ConsoleManager
 
     void listLongestCycles(std::vector<GraphData>& graphs_data)
     {
-        write("Najdluzsze cykle: \n");
         for (int i = 0; i < graphs_data.size(); ++i)
         {
             GraphData& graph_data = graphs_data[i];
 
             if (graphs_data[i].getNodesCount() > 8)
-                write("|- graf " + std::to_string(i) + ": liczba wierzcholkow > 8 - obliczenia pominiete \n");
+                write("|- graf " + std::to_string(i) + ": liczba wierzcholkow > 8 - pominieto \n");
             else
             {
                 if (graph_data.isLongestCyclesAssigned())
                 {
                     std::chrono::milliseconds duration = graph_data.getLongestCyclesTime();
-                    write("|- graf " + std::to_string(i) + ": \n");
-                    write("|  |- czas wykonania: " + std::to_string(duration.count()) + "ms\n");
+                    write("|  |- czas wykonywania funkcji: " + std::to_string(duration.count()) + "ms\n");
                     std::vector<std::vector<int>> longest_cycles = graph_data.getLongestCycles();
                     if (longest_cycles.size() == 0)
                     {
@@ -312,7 +310,7 @@ struct ConsoleManager
                     else
                     {
                         std::vector<int> first_longest_cycle = longest_cycles[0];
-                        write("|  |- dlugosc najdluzszego cyklu: " + std::to_string(first_longest_cycle.size() - 1) + " (Liczba znalezionych cykli: " + std::to_string(longest_cycles.size()) + ")\n");
+                        write("|  |- dlugosc najdluzszego cyklu: " + std::to_string(first_longest_cycle.size()) + " (liczba cykli: " + std::to_string(longest_cycles.size()) + ")\n");
                         write("|  |- pierwszy wynik:");
                         printCycle(first_longest_cycle);
                         write("\n");

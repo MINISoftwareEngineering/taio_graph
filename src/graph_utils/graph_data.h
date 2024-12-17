@@ -155,6 +155,7 @@ public:
 private:
     bool precise_hamilton_cycles_extensions_assigned = false;
     std::vector<std::pair<int,int>> precise_hamilton_cycle_graph_extention;
+    std::vector<std::vector<int>> precise_hamilton_cycles;
     int precise_hamilton_cycle_count;
     std::chrono::milliseconds precise_hamilton_cycle_time;
 #pragma endregion
