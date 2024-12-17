@@ -38,7 +38,7 @@ private:
 
 #pragma region hamiltonCycle
 public:
-	void traverseOtherVertices(GraphData& graph_data, std::vector<std::pair<int, int>>& smallest_extension, std::vector<std::pair<int, int>>& current_extension, std::vector<int>& current_path, int& hamilton_cycle_count);
+	void traverseOtherVertices(GraphData& graph_data, std::vector<std::pair<int, int>>& smallest_extension, std::vector<std::pair<int, int>>& current_extension, std::vector<int>& current_path, int& hamilton_cycle_count, std::vector<std::vector<int>>& longest_cycles);
 	void findHamiltonCycle(GraphData& graph_data);
 #pragma endregion
 

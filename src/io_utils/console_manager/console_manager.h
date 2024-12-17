@@ -83,15 +83,14 @@ struct ConsoleManager
                 + std::to_string(graph_manager.getGraphSize(graphs_data[i])) + "\n");
     }
 
-    void listPreciseGraphsHamiltonCycleExtentions(std::vector<GraphData>& graphs_data)
+    void listPreciseGraphsHamiltonCycleExtentions(std::vector<GraphData>& graphs_data, bool long_output)
     {
-        write("Precise Graphs Hamilton Cycle extentions: \n");
         for (int i = 0; i < graphs_data.size(); ++i)
         {
             GraphData& graph_data = graphs_data[i];
 
             if (graphs_data[i].getNodesCount() > 8)
-                write("|- graph " + std::to_string(i) + ": node count > 8 - omitted \n");
+                write("Liczba wierzcholkow > 8 - graf pominiety \n");
             else
             {
                 if (graph_data.isPreciseHamiltonCycleGraphExtentionAssigned())
@@ -104,11 +103,9 @@ struct ConsoleManager
                     //std::string find_extention_execution_time = std::to_string(graph_data.findMinimumExtentionForHamiltonCycleExecutionTimeMs);
                     std::chrono::milliseconds duration = graph_data.getPreciseHamiltonCycleTime();
 
-                    write("|- graph " + std::to_string(i) + ": \n");
                     //write("|  |- finding full solution time: " + full_execution_time + " ms  (finding minumum graph: " + find_extention_execution_time + " ms, finding hamilton cycles: " + find_cycles_execution_time + " ms) \n");
-                    write("|  |- execution time: " + std::to_string(duration.count()) + "ms\n");
-                    write("|  |- hamilton cycles: " + precise_hamilton_cycles_count + " \n");
-                    write("|  |- smallest extention (edges count: " + std::to_string(graph_data.getPreciseHamiltonCycleGraphExtension().size()) + "): \n|  |- [");
+                    write("|- czas wykonania: " + std::to_string(duration.count()) + "ms\n");
+                    write("|- najmniejsze rozszerzenie (liczba krawedzi: " + std::to_string(graph_data.getPreciseHamiltonCycleGraphExtension().size()) + "): \n| [");
                     
                     std::vector<std::pair<int, int>> precise_hamilton_cycle_graph_extention = graph_data.getPreciseHamiltonCycleGraphExtension();
                     for (int j = 0; j < precise_hamilton_cycle_graph_extention.size(); j++)
@@ -119,9 +116,10 @@ struct ConsoleManager
                             write(", ");
                     }
                     write("]\n");
+                    write("|- liczba cykli Hamiltona (po dodaniu minimalnego rozszerzenia): " + precise_hamilton_cycles_count + " \n");
                 }
                 else
-                    write("|- graph " + std::to_string(i) + ": Finding failed \n");
+                    write("|- Blad - nie znaleziono grafu \n");
             }
             
         }
@@ -311,9 +309,6 @@ struct ConsoleManager
                     {
                         std::vector<int> first_longest_cycle = longest_cycles[0];
                         write("|  |- dlugosc najdluzszego cyklu: " + std::to_string(first_longest_cycle.size()) + " (liczba cykli: " + std::to_string(longest_cycles.size()) + ")\n");
-                        write("|  |- pierwszy wynik:");
-                        printCycle(first_longest_cycle);
-                        write("\n");
                     }
                 }
                 else
