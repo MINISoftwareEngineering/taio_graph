@@ -432,7 +432,7 @@ int GraphManager::takeOutRandomValue(std::vector<int>& vec) {
 
 
 #pragma region hamiltonCycle
-void GraphManager::traverseOtherVertices(GraphData& graph_data, std::vector<std::pair<int, int>>& smallest_extension, std::vector<std::pair<int, int>>& current_extension, std::vector<int>& current_path, int& hamilton_cycle_count)
+void GraphManager::traverseOtherVertices(GraphData& graph_data, std::vector<std::pair<int, int>>& smallest_extension, std::vector<std::pair<int, int>>& current_extension, std::vector<int>& current_path, int& hamilton_cycle_count, std::vector<std::vector<int>>& hamilton_cycles)
 {
 	int last_vertex = current_path.back();
 	std::unordered_set<int> out_neighbours = graph_data.out_edges_by_node[last_vertex];
@@ -446,6 +446,14 @@ void GraphManager::traverseOtherVertices(GraphData& graph_data, std::vector<std:
 		{
 			smallest_extension.clear();
 			hamilton_cycle_count++;
+
+			std::vector<int> ordered_cycle;
+			auto min_vertex = std::min_element(current_path.begin(), current_path.end());
+			int min_index = std::distance(current_path.begin(), min_vertex);
+			ordered_cycle.insert(ordered_cycle.end(), current_path.begin() + min_index, current_path.end());
+			ordered_cycle.insert(ordered_cycle.end(), current_path.begin(), current_path.begin() + min_index);
+			if (std::find(hamilton_cycles.begin(), hamilton_cycles.end(), ordered_cycle) == hamilton_cycles.end())
+				hamilton_cycles.push_back(ordered_cycle);
 		}
 
 
@@ -468,7 +476,7 @@ void GraphManager::traverseOtherVertices(GraphData& graph_data, std::vector<std:
 			if (out_neighbours.find(i) == out_neighbours.end())
 				current_extension.push_back(std::pair<int, int>(last_vertex, i));
 			current_path.push_back(i);
-			traverseOtherVertices(graph_data, smallest_extension, current_extension, current_path, hamilton_cycle_count);
+			traverseOtherVertices(graph_data, smallest_extension, current_extension, current_path, hamilton_cycle_count, hamilton_cycles);
 			if (out_neighbours.find(i) == out_neighbours.end())
 				current_extension.pop_back();
 			current_path.pop_back();
@@ -480,6 +488,7 @@ void GraphManager::traverseOtherVertices(GraphData& graph_data, std::vector<std:
 void GraphManager::findHamiltonCycle(GraphData& graph_data)
 {
 	GraphData graph_data_temp = graph_data;
+	std::vector<std::vector<int>> hamilton_cycles;
 
 	auto start = std::chrono::high_resolution_clock::now();
 
@@ -493,7 +502,7 @@ void GraphManager::findHamiltonCycle(GraphData& graph_data)
 	for (int i = 0; i < graph_data_temp.getNodesCount(); i++)
 	{
 		current_path.push_back(i);
-		traverseOtherVertices(graph_data_temp, smallest_extension, current_extension, current_path, hamilton_cycle_count);
+		traverseOtherVertices(graph_data_temp, smallest_extension, current_extension, current_path, hamilton_cycle_count, hamilton_cycles);
 		current_path.pop_back();
 	}
 
@@ -508,13 +517,13 @@ void GraphManager::findHamiltonCycle(GraphData& graph_data)
 		for (int i = 0; i < graph_data_temp.getNodesCount(); i++)
 		{
 			current_path.push_back(i);
-			traverseOtherVertices(graph_data_temp, temp_smallest_extension, current_extension, current_path, hamilton_cycle_count);
+			traverseOtherVertices(graph_data_temp, temp_smallest_extension, current_extension, current_path, hamilton_cycle_count, hamilton_cycles);
 			current_path.pop_back();
 		}
 		hamilton_cycle_count /= graph_data_temp.getNodesCount();
 	}
 
-	graph_data.assignHamiltonCyclesAndExtensions(smallest_extension, hamilton_cycle_count);
+	graph_data.assignHamiltonCyclesAndExtensions(smallest_extension, hamilton_cycle_count, hamilton_cycles);
 
 	auto end = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
