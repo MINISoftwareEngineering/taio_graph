@@ -290,30 +290,28 @@ struct ConsoleManager
 
     void listLongestCycles(std::vector<GraphData>& graphs_data)
     {
-        write("Longest cycles: \n");
         for (int i = 0; i < graphs_data.size(); ++i)
         {
             GraphData& graph_data = graphs_data[i];
 
             if (graphs_data[i].getNodesCount() > 8)
-                write("|- graph " + std::to_string(i) + ": node count > 8 - omitted \n");
+                write("|- graf " + std::to_string(i) + ": liczba wierzcholkow > 8 - pominieto \n");
             else
             {
                 if (graph_data.isLongestCyclesAssigned())
                 {
                     std::chrono::milliseconds duration = graph_data.getLongestCyclesTime();
-                    write("|- graph " + std::to_string(i) + ": \n");
-                    write("|  |- execution time: " + std::to_string(duration.count()) + "ms\n");
+                    write("|  |- czas wykonywania funkcji: " + std::to_string(duration.count()) + "ms\n");
                     std::vector<std::vector<int>> longest_cycles = graph_data.getLongestCycles();
                     if (longest_cycles.size() == 0)
                     {
-                        write("|  |- No cycles found!\n");
+                        write("|  |- Nie znaleziono cykli!\n");
                     }
                     else
                     {
                         std::vector<int> first_longest_cycle = longest_cycles[0];
-                        write("|  |- longest cycle length: " + std::to_string(first_longest_cycle.size() - 1) + " (" + std::to_string(longest_cycles.size()) + " cycles)\n");
-                        write("|  |- first result:");
+                        write("|  |- dlugosc najdluzszego cyklu: " + std::to_string(first_longest_cycle.size()) + " (liczba cykli: " + std::to_string(longest_cycles.size()) + ")\n");
+                        write("|  |- pierwszy wynik:");
                         printCycle(first_longest_cycle);
                         write("\n");
                     }
@@ -327,35 +325,35 @@ struct ConsoleManager
 
     void listGraphsLongestCycles(std::vector<GraphData>& graphs_data)
     {
-        write("Approximate Graphs Longest Cycles: \n");
+        write("Najdluzsze cykle (algorytm aproksymacyjny): \n");
         for (int i = 0; i < graphs_data.size(); ++i) {
             GraphData& graph_data = graphs_data[i];
             int graph_size = graph_manager.getGraphSize(graph_data);
             std::chrono::milliseconds duration = graph_data.getApproximateLongestCyclesTime();
             int approximate_longest_cycles_count = graph_data.getApproximateLongestCycles().size();
             std::vector<std::vector<int>> approximate_longest_cycles_values = graph_data.getApproximateLongestCycles();
-            write("|-      graph " + std::to_string(i) + "    Size: " + std::to_string(graph_size) + ": \n");
-            write("|- execution time: " + std::to_string(duration.count()) + "ms\n");
+            write("|-      graf " + std::to_string(i) + "    Rozmiar: " + std::to_string(graph_size) + ": \n");
+            write("|- czas wykonania: " + std::to_string(duration.count()) + "ms\n");
             if (approximate_longest_cycles_count > 0)
             {
-                write("|- approximate longest cycles (length " + std::to_string(approximate_longest_cycles_values[0].size()) + ") : \n");
+                write("|- Najdluzsze cykle (aproksymacyjny) (dlugosc najdluzszego cyklu: " + std::to_string(approximate_longest_cycles_values[0].size()) + ") : \n");
                 for (int j = 0; j < approximate_longest_cycles_count; j++)
                 {
-                    write("|- cycle " + std::to_string(j) + ": \n");
+                    write("|- cykl numer " + std::to_string(j) + ": \n");
                     printCycle(approximate_longest_cycles_values[j]);
                 }
             }
             else
             {
-                write("|- approximate longest cycles: ");
-                write("  No approximate cycles found!\n");
+                write("|- Najdluzsze cykle (aproksymacyjny): ");
+                write("  Nie znaleziono cykli!\n");
             }
         }
     }
     void printCycle(const std::vector<int>& cycle)
     {
         if (cycle.empty()) {
-            write("The cycle is empty.\n");
+            write("Cykl jest pusty.\n");
             return;
         }
         write(std::to_string(cycle[0]));
