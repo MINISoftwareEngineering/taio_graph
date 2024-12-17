@@ -317,7 +317,7 @@ struct ConsoleManager
                     }
                 }
                 else
-                    write("|- graph " + std::to_string(i) + ": Finding failed \n");
+                    write("|- graf " + std::to_string(i) + ": Obliczenia nie powiodly sie \n");
             }
 
         }
