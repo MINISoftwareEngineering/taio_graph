@@ -333,6 +333,12 @@ void AppController::hamilton(ProgramCommand command)
 					}
 
 				}
+				else if (!graphs.at(i).getPreciseHamiltonCycles().empty())
+				{
+					console_manager.write("|- Pierwszy znaleziony cykl:\n| ");
+					auto cycle = graphs.at(i).getPreciseHamiltonCycles().front();
+					console_manager.printCycle(cycle);
+				}
 			}
 			else
 				console_manager.write("Dokladny algorytm pominiety, graf ma wiecej niz 8 wierzcholkow\n");
@@ -397,6 +403,12 @@ void AppController::max_cycles(ProgramCommand command)
 					}
 
 				}
+				else if (!command.long_output && !graphs.at(i).getLongestCycles().empty())
+				{
+					console_manager.write("|- Pierwszy znaleziony cykl:\n| ");
+					auto cycle = graphs.at(i).getLongestCycles().front();
+					console_manager.printCycle(cycle);
+				}
 			}
 			else
 				console_manager.write("Dokladny algorytm pominiety, graf ma wiecej niz 8 wierzcholkow\n");
@@ -413,7 +425,22 @@ void AppController::max_cycles(ProgramCommand command)
 
 			if (command.long_output && !graphs.at(i).getApproximateLongestCycles().empty()) {
 				auto cycle = graphs.at(i).getApproximateLongestCycles().front();
-				console_manager.writeCycleOnGraph(graphs.at(i), cycle);
+				//console_manager.writeCycleOnGraph(graphs.at(i), cycle);
+				for (int j = 0; j < graphs.at(i).getApproximateLongestCycles().size(); j++)
+				{
+					console_manager.write("\n|- Cykl nr ");
+					console_manager.write(std::to_string(j+1));
+					console_manager.write("\n| ");
+					auto cycle = graphs.at(i).getApproximateLongestCycles()[j];
+					console_manager.printCycle(cycle);
+					console_manager.writeCycleOnGraph(graphs.at(i), cycle);
+				}
+			}
+			else if (!command.long_output && !graphs.at(i).getApproximateLongestCycles().empty())
+			{
+				console_manager.write("|- Pierwszy znaleziony cykl:\n| ");
+				auto cycle = graphs.at(i).getApproximateLongestCycles().front();
+				console_manager.printCycle(cycle);
 			}
 		}
 	}
