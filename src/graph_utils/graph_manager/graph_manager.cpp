@@ -507,7 +507,7 @@ void GraphManager::findHamiltonCycle(GraphData& graph_data)
 	}
 
 	hamilton_cycle_count /= graph_data_temp.getNodesCount();
-	if (hamilton_cycle_count == 0)
+	if (hamilton_cycle_count == 0 && graph_data_temp.getNodesCount() > 1)
 	{
 		for (int i = 0; i < smallest_extension.size(); i++)
 		{
