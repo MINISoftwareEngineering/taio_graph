@@ -105,18 +105,22 @@ struct ConsoleManager
 
                     //write("|  |- finding full solution time: " + full_execution_time + " ms  (finding minumum graph: " + find_extention_execution_time + " ms, finding hamilton cycles: " + find_cycles_execution_time + " ms) \n");
                     write("|- czas wykonania: " + std::to_string(duration.count()) + "ms\n");
-                    write("|- najmniejsze rozszerzenie (liczba krawedzi: " + std::to_string(graph_data.getPreciseHamiltonCycleGraphExtension().size()) + "): \n| [");
-                    
-                    std::vector<std::pair<int, int>> precise_hamilton_cycle_graph_extention = graph_data.getPreciseHamiltonCycleGraphExtension();
-                    for (int j = 0; j < precise_hamilton_cycle_graph_extention.size(); j++)
+                    if (!graph_data.getPreciseHamiltonCycles().empty())
                     {
-                        std::pair<int, int> current_edge = precise_hamilton_cycle_graph_extention[j];
-                        write(std::to_string(current_edge.first) + " -> " + std::to_string(current_edge.second));
-                        if (j < precise_hamilton_cycle_graph_extention.size() - 1)
-                            write(", ");
+                        write("|- najmniejsze rozszerzenie (liczba krawedzi: " + std::to_string(graph_data.getPreciseHamiltonCycleGraphExtension().size()) + "): \n| [");
+
+                        std::vector<std::pair<int, int>> precise_hamilton_cycle_graph_extention = graph_data.getPreciseHamiltonCycleGraphExtension();
+                        for (int j = 0; j < precise_hamilton_cycle_graph_extention.size(); j++)
+                        {
+                            std::pair<int, int> current_edge = precise_hamilton_cycle_graph_extention[j];
+                            write(std::to_string(current_edge.first) + " -> " + std::to_string(current_edge.second));
+                            if (j < precise_hamilton_cycle_graph_extention.size() - 1)
+                                write(", ");
+                        }
+                        write("]\n");
+                        write("|- liczba cykli Hamiltona (po dodaniu minimalnego rozszerzenia): " + precise_hamilton_cycles_count + " \n");
                     }
-                    write("]\n");
-                    write("|- liczba cykli Hamiltona (po dodaniu minimalnego rozszerzenia): " + precise_hamilton_cycles_count + " \n");
+                    else write("|- nie znaleziono rozszerzenia do cyklu Hamiltona\n");
                 }
                 else
                     write("|- Blad - nie znaleziono grafu \n");

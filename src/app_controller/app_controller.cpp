@@ -335,7 +335,7 @@ void AppController::hamilton(ProgramCommand command)
 				}
 				else if (!graphs.at(i).getPreciseHamiltonCycles().empty())
 				{
-					console_manager.write("|- Pierwszy znaleziony cykl:\n| ");
+					console_manager.write("|- Przykladowy znaleziony cykl:\n| ");
 					auto cycle = graphs.at(i).getPreciseHamiltonCycles().front();
 					console_manager.printCycle(cycle);
 				}
@@ -405,7 +405,7 @@ void AppController::max_cycles(ProgramCommand command)
 				}
 				else if (!command.long_output && !graphs.at(i).getLongestCycles().empty())
 				{
-					console_manager.write("|- Pierwszy znaleziony cykl:\n| ");
+					console_manager.write("|- Przykladowy znaleziony cykl:\n| ");
 					auto cycle = graphs.at(i).getLongestCycles().front();
 					console_manager.printCycle(cycle);
 				}
@@ -438,7 +438,7 @@ void AppController::max_cycles(ProgramCommand command)
 			}
 			else if (!command.long_output && !graphs.at(i).getApproximateLongestCycles().empty())
 			{
-				console_manager.write("|- Pierwszy znaleziony cykl:\n| ");
+				console_manager.write("|- Przykladowy znaleziony cykl:\n| ");
 				auto cycle = graphs.at(i).getApproximateLongestCycles().front();
 				console_manager.printCycle(cycle);
 			}
