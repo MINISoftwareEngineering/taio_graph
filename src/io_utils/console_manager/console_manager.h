@@ -327,16 +327,16 @@ struct ConsoleManager
             std::chrono::milliseconds duration = graph_data.getApproximateLongestCyclesTime();
             int approximate_longest_cycles_count = graph_data.getApproximateLongestCycles().size();
             std::vector<std::vector<int>> approximate_longest_cycles_values = graph_data.getApproximateLongestCycles();
-            write("|-      graf " + std::to_string(i) + "    Rozmiar: " + std::to_string(graph_size) + ": \n");
+            write("|- Rozmiar grafu: " + std::to_string(graph_size) + ": \n");
             write("|- czas wykonania: " + std::to_string(duration.count()) + "ms\n");
             if (approximate_longest_cycles_count > 0)
             {
                 write("|- Najdluzsze cykle (aproksymacyjny) (dlugosc najdluzszego cyklu: " + std::to_string(approximate_longest_cycles_values[0].size()) + ") : \n");
-                for (int j = 0; j < approximate_longest_cycles_count; j++)
+                /*for (int j = 0; j < approximate_longest_cycles_count; j++)
                 {
                     write("|- cykl numer " + std::to_string(j) + ": \n");
                     printCycle(approximate_longest_cycles_values[j]);
-                }
+                }*/
             }
             else
             {
