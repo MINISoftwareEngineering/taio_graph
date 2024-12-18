@@ -165,92 +165,107 @@ struct ConsoleManager
             }
             else
                 write("|  |- macierz sąsiedztwa: (nie wyświetlona, za dużo wierzchołków) \n");*/
-            if (long_output)
+            if (long_output && graph_data.getNodesCount() > 1)
                 write("|- czas szukania wyniku: " + full_execution_time + " ms  (minimalne rozszerzenie: " + find_extention_execution_time + " ms, liczba cykli: " + find_cycles_execution_time + " ms) \n");
             else
                 write("|- czas szukania wyniku: " + full_execution_time + " ms \n");
 
-
-            write("|- najmniejsze rozszerzenie (liczba krawedzi: " + std::to_string(graph_data.getHamiltonCycleGraphExtentionSize()) + "): \n");
-            write(graph_data.getHamiltonCycleGraphExtention());
-
-            GraphData graph_data_ex = graph_data;
-            if (long_output)
+            if (graph_data.getNodesCount() == 1)
             {
-                if (graph_data.getNodesCount() <= 32)
-                {
-                    write("|  rozszerzenie zaznaczone na macierzy sasiedztwa: \n");
-
-
-                    for each (edge e in graph_data_ex.getHamiltonCycleGraphExtention())
-                    {
-                        graph_manager.addEdge(graph_data_ex, e);
-                    }
-
-                    for (int j = 0; j < graph_data.getNodesCount(); j++)
-                    {
-                        write("|   [");
-                        for (int k = 0; k < graph_data_ex.getNodesCount(); k++)
-                        {
-                            if (graph_manager.hasEdge(graph_data, j, k))
-                            {
-                                write(" 1 ");
-                            }
-                            else if (graph_manager.hasEdge(graph_data_ex, j, k))
-                            {
-                                write("(1)");
-                            }
-                            else write(" 0 ");
-                        }
-                        write("] \n");
-                    }
-                }
-                else
-                    write("|  rozszerzenie zaznaczone na macierzy sasiedztwa: (nie wyswietlone, za duzo wierzchołkow) \n");
+                write("|- nie znaleziono rozszerzenia do cyklu Hamiltona\n");
             }
-
-            write("|- liczba cykli hamiltona" + note + ": " + hamilton_cycles_count + " \n");
-
-            if (long_output)
+            else
             {
-                if (graph_data.getNodesCount() <= 32)
+                write("|- najmniejsze rozszerzenie (liczba krawedzi: " + std::to_string(graph_data.getHamiltonCycleGraphExtentionSize()) + "): \n");
+                write(graph_data.getHamiltonCycleGraphExtention());
+
+                GraphData graph_data_ex = graph_data;
+                if (long_output)
                 {
-                    std::string no_cycles = "";
-                    if (graph_data.getHamiltonCycles().size() == 0)
-                        no_cycles = "brak cykli ";
-
-                    write("|  cykle zaznaczone na macierzy sadziedztwa: " + no_cycles + "\n");
-
-                    int c = 1;
-                    for each (path_t cycle in graph_data.getHamiltonCycles())
+                    if (graph_data.getNodesCount() <= 32)
                     {
-                        write("|  |- cykl " + std::to_string(c++) + ": ");
-                        std::cout << cycle;
-                        write("\n");
+                        write("|  rozszerzenie zaznaczone na macierzy sasiedztwa: \n");
+
+
+                        for each (edge e in graph_data_ex.getHamiltonCycleGraphExtention())
+                        {
+                            graph_manager.addEdge(graph_data_ex, e);
+                        }
+
                         for (int j = 0; j < graph_data.getNodesCount(); j++)
                         {
-                            write("|  |  |   [");
-                            for (int k = 0; k < graph_data.getNodesCount(); k++)
+                            write("|   [");
+                            for (int k = 0; k < graph_data_ex.getNodesCount(); k++)
                             {
-                                if (graph_manager.hasEdge(graph_data_ex, j, k))
+                                if (graph_manager.hasEdge(graph_data, j, k))
                                 {
-                                    auto it = std::find(cycle.begin(), cycle.end(), j);
-                                    int index = std::distance(cycle.begin(), it);
-
-                                    if (cycle[(index + 1) % graph_data.getNodesCount()] == k)
-                                        write("(1)");
-                                    else
-                                        write(" 1 ");
+                                    write(" 1 ");
                                 }
-                                else
-                                    write(" 0 ");
+                                else if (graph_manager.hasEdge(graph_data_ex, j, k))
+                                {
+                                    write("(1)");
+                                }
+                                else write(" 0 ");
                             }
                             write("] \n");
                         }
                     }
+                    else
+                        write("|  rozszerzenie zaznaczone na macierzy sasiedztwa: (nie wyswietlone, za duzo wierzchołkow) \n");
                 }
-                else
-                    write("|  cykle zaznaczone na macierzy sadziedztwa: (nie wyswietlone, za duzo wierzcholkow) \n");
+
+                write("|- liczba cykli hamiltona" + note + ": " + hamilton_cycles_count + " \n");
+
+                if (long_output)
+                {
+                    if (graph_data.getNodesCount() <= 32)
+                    {
+                        std::string no_cycles = "";
+                        if (graph_data.getHamiltonCycles().size() == 0)
+                            no_cycles = "brak cykli ";
+
+                        write("|  cykle zaznaczone na macierzy sadziedztwa: " + no_cycles + "\n");
+
+                        int c = 1;
+                        for each (path_t cycle in graph_data.getHamiltonCycles())
+                        {
+                            write("|  |- cykl " + std::to_string(c++) + ": ");
+                            std::cout << cycle;
+                            write("\n");
+                            for (int j = 0; j < graph_data.getNodesCount(); j++)
+                            {
+                                write("|  |  |   [");
+                                for (int k = 0; k < graph_data.getNodesCount(); k++)
+                                {
+                                    if (graph_manager.hasEdge(graph_data_ex, j, k))
+                                    {
+                                        auto it = std::find(cycle.begin(), cycle.end(), j);
+                                        int index = std::distance(cycle.begin(), it);
+
+                                        if (cycle[(index + 1) % graph_data.getNodesCount()] == k)
+                                            write("(1)");
+                                        else
+                                            write(" 1 ");
+                                    }
+                                    else
+                                        write(" 0 ");
+                                }
+                                write("] \n");
+                            }
+                        }
+                    }
+                    else
+                        write("|  cykle zaznaczone na macierzy sadziedztwa: (nie wyswietlone, za duzo wierzcholkow) \n");
+                }
+                else if (!graph_data.getHamiltonCycles().empty())
+                {
+                    write("|- Przykladowy znaleziony cykl:\n|   ");
+                    for each (path_t path in graph_data.getHamiltonCycles())
+                    {
+                        printCycle(path);
+                        break;
+                    }
+                }
             }
         }
         else
