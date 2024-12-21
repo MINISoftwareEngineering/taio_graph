@@ -313,7 +313,52 @@ void AppController::hamilton(ProgramCommand command)
 				graph_manager.findHamiltonCycle(graphs.at(i));
 				console_manager.write("Wyznaczanie dokladne skonczone\n");
 				std::vector<GraphData> stub_vector = { graphs.at(i) };
-				console_manager.listPreciseGraphsHamiltonCycleExtentions(stub_vector);
+				console_manager.listPreciseGraphsHamiltonCycleExtentions(stub_vector, command.long_output);
+				if (command.long_output && !graphs.at(i).getPreciseHamiltonCycles().empty()) {
+					
+					for (int graph_id = 0; graph_id < graphs.at(i).getPreciseHamiltonCycles().size(); graph_id++)
+					{
+						
+						GraphData graphWithExtension = graphs.at(i);
+						auto cycle = graphs.at(i).getPreciseHamiltonCycles()[graph_id];
+						std::vector<std::pair<int, int>> cycleEdges;
+						for (int j = 0; j < cycle.size(); j++)
+						{
+							cycleEdges.push_back(std::pair<int, int>(cycle[j], cycle[(j + 1) % cycle.size()]));
+							edge newEdge = { cycle[j], cycle[(j+1)%cycle.size()]};
+							graph_manager.addEdge(graphWithExtension, newEdge);
+						}
+						console_manager.write("|- Cykl Hamiltona nr ");
+						console_manager.write(std::to_string(graph_id + 1));
+						console_manager.write(":\n| ");
+						console_manager.printCycle(cycle);
+						for (int row = 0; row < graphWithExtension.getNodesCount(); row++)
+						{
+							console_manager.write("| [");
+							for (int column = 0; column < graphWithExtension.getNodesCount(); column++)
+							{
+								if (std::find(cycleEdges.begin(), cycleEdges.end(), std::pair<int,int>(row, column))!=cycleEdges.end())
+								{
+									console_manager.write("(1)");
+								}
+								else if (graph_manager.hasEdge(graphs.at(i), row, column))
+								{
+									console_manager.write(" 1 ");
+								}
+								else console_manager.write(" 0 ");
+							}
+							console_manager.write("]\n");
+						}
+						//console_manager.writeCycleOnGraph(graphWithExtension, cycle);
+					}
+
+				}
+				else if (!graphs.at(i).getPreciseHamiltonCycles().empty())
+				{
+					console_manager.write("|- Przykladowy znaleziony cykl:\n| ");
+					auto cycle = graphs.at(i).getPreciseHamiltonCycles().front();
+					console_manager.printCycle(cycle);
+				}
 			}
 			else
 				console_manager.write("Dokladny algorytm pominiety, graf ma wiecej niz 8 wierzcholkow\n");
@@ -330,7 +375,7 @@ void AppController::hamilton(ProgramCommand command)
 				console_manager.write("Nie udalo sie znalezc aproksymacji rozszerzenia hamiltonowskiego\n");
 			else
 				console_manager.write("Wyznaczenie aproksymacyjne udane\n");
-			console_manager.writeGraphHamiltonCycleExtention(graphs.at(i));
+			console_manager.writeGraphHamiltonCycleExtention(graphs.at(i), command.long_output);
 		}
 	}
 }
@@ -367,8 +412,22 @@ void AppController::max_cycles(ProgramCommand command)
 				console_manager.listLongestCycles(stub_vector);
 
 				if (command.long_output && !graphs.at(i).getLongestCycles().empty()) {
+					for (int j = 0; j < graphs.at(i).getLongestCycles().size(); j++)
+					{
+						console_manager.write("\n| Cykl nr ");
+						console_manager.write(std::to_string(j + 1));
+						console_manager.write(":\n");
+						auto cycle = graphs.at(i).getLongestCycles()[j];
+						console_manager.printCycle(cycle);
+						console_manager.writeCycleOnGraph(graphs.at(i), cycle);
+					}
+
+				}
+				else if (!command.long_output && !graphs.at(i).getLongestCycles().empty())
+				{
+					console_manager.write("|- Przykladowy znaleziony cykl:\n| ");
 					auto cycle = graphs.at(i).getLongestCycles().front();
-					console_manager.writeCycleOnGraph(graphs.at(i), cycle);
+					console_manager.printCycle(cycle);
 				}
 			}
 			else
@@ -386,7 +445,22 @@ void AppController::max_cycles(ProgramCommand command)
 
 			if (command.long_output && !graphs.at(i).getApproximateLongestCycles().empty()) {
 				auto cycle = graphs.at(i).getApproximateLongestCycles().front();
-				console_manager.writeCycleOnGraph(graphs.at(i), cycle);
+				//console_manager.writeCycleOnGraph(graphs.at(i), cycle);
+				for (int j = 0; j < graphs.at(i).getApproximateLongestCycles().size(); j++)
+				{
+					console_manager.write("\n|- Cykl nr ");
+					console_manager.write(std::to_string(j+1));
+					console_manager.write("\n| ");
+					auto cycle = graphs.at(i).getApproximateLongestCycles()[j];
+					console_manager.printCycle(cycle);
+					console_manager.writeCycleOnGraph(graphs.at(i), cycle);
+				}
+			}
+			else if (!command.long_output && !graphs.at(i).getApproximateLongestCycles().empty())
+			{
+				console_manager.write("|- Przykladowy znaleziony cykl:\n| ");
+				auto cycle = graphs.at(i).getApproximateLongestCycles().front();
+				console_manager.printCycle(cycle);
 			}
 		}
 	}

@@ -117,7 +117,7 @@ private:
 
 #pragma region hamiltonCycle
 public:
-    void assignHamiltonCyclesAndExtensions(std::vector<std::pair<int, int>>& smallest_extension, int& cycle_count)
+    void assignHamiltonCyclesAndExtensions(std::vector<std::pair<int, int>>& smallest_extension, int& cycle_count, std::vector<std::vector<int>>& precise_hamilton_cycles)
     {
         if (precise_hamilton_cycles_extensions_assigned)
             throw new std::runtime_error("Precise Hamilton cycles and extensions already assigned.");
@@ -125,6 +125,14 @@ public:
         precise_hamilton_cycles_extensions_assigned = true;
         this->precise_hamilton_cycle_graph_extention = smallest_extension;
         this->precise_hamilton_cycle_count = cycle_count;
+        this->precise_hamilton_cycles = precise_hamilton_cycles;
+    }
+    const std::vector<std::vector<int>>& getPreciseHamiltonCycles()
+    {
+        if (!precise_hamilton_cycles_extensions_assigned)
+            throw new std::runtime_error("Assign longest cycles first.");
+
+        return precise_hamilton_cycles;
     }
     const std::vector<std::pair<int, int>> getPreciseHamiltonCycleGraphExtension()
     {
@@ -155,6 +163,7 @@ public:
 private:
     bool precise_hamilton_cycles_extensions_assigned = false;
     std::vector<std::pair<int,int>> precise_hamilton_cycle_graph_extention;
+    std::vector<std::vector<int>> precise_hamilton_cycles;
     int precise_hamilton_cycle_count;
     std::chrono::milliseconds precise_hamilton_cycle_time;
 #pragma endregion
