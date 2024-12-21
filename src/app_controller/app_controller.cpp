@@ -31,7 +31,7 @@ void AppController::run(ProgramCommand command, RunData& data)
 		}
 	}
 
-#define METRIC_TESTS
+//#define METRIC_TESTS
 #ifdef METRIC_TESTS
 	run_metric_tests();
 #endif
@@ -105,6 +105,13 @@ void AppController::run_metric_tests() {
 	std::vector<std::vector<std::string>> rows = {
 		{ "Accurate Result", "Accurate Time", "Approximate Result", "Approximate Time", "Graph1 Size", "Graph 2 Size" }
 	};
+
+	for (int i = 0; i < test_graphs1.size(); i++) {
+		auto res1 = graph_manager.getMetricDistance(test_graphs1[i], test_graphs1[i]);
+		auto res2 = graph_manager.tryGetMetricDistance(test_graphs1[i], test_graphs1[i]);
+		assert(res1 == 0);
+		assert(res2 == 0);
+	}
 
 	// Iterate over each group of graphs by size
 	for (auto& [size, graphs] : graphs_by_size) {
