@@ -1,5 +1,6 @@
 ﻿#include "app_controller.h"
 #include "output_manger/output_manager.h"
+#include <map>
 
 void AppController::run(ProgramCommand command, RunData& data)
 {
@@ -30,6 +31,7 @@ void AppController::run(ProgramCommand command, RunData& data)
 		}
 	}
 
+#define METRIC_TESTS
 #ifdef METRIC_TESTS
 	run_metric_tests();
 #endif
@@ -88,46 +90,64 @@ void AppController::run_hamilton_tests()
 }
 
 void AppController::run_metric_tests() {
-	int id_offset = 0;
-	graph_data_loader.loadGraphsFromFileData(metric_tests_graphs, METRIC_TESTS_INPUT_PATH, id_offset);
+	// Load the graphs from the input file
+	std::vector<GraphData> test_graphs1 = graph_data_loader.loadGraphsFromFile("./resources/input/hamilton_tests_data.txt");
 
-	std::string metric_test_output = "metric_tests.csv";
-	createCSV("metric_tests.csv");
-	std::vector<std::vector<std::string>> rows = { { "Accurate Result", "Accurate Time", "Approximate Result", "Approximate Time", "Graph1 Size", "Graph 2 Size"} };
-	for (int i = 0; i < metric_tests_graphs.size(); i += 2) {
-
-		int time_of_accurate = 0;
-		int accurate = measure_execution_time(
-			time_of_accurate,
-			[&]() {
-				return graph_manager.getMetricDistance(metric_tests_graphs[i], metric_tests_graphs[i + 1]);
-			}
-		);
-
-
-		int time_of_approximate = 0;
-		int approximate = measure_execution_time(
-			time_of_approximate,
-			[&]() {
-				return graph_manager.tryGetMetricDistance(metric_tests_graphs[i], metric_tests_graphs[i + 1]);
-			}
-		);
-
-		std::vector<std::string> row = {
-			std::to_string(accurate),
-			std::to_string(time_of_accurate),
-			std::to_string(approximate),
-			std::to_string(time_of_approximate),
-			std::to_string(metric_tests_graphs[i].getNodesCount()),
-			std::to_string(metric_tests_graphs[i + 1].getNodesCount())
-		};
-
-		rows.push_back(row);
-
+	// Organize graphs by size
+	std::map<int, std::vector<GraphData>> graphs_by_size;
+	for (auto& graph : test_graphs1) {
+		graphs_by_size[graph.getNodesCount()].push_back(graph);
 	}
 
+	// Prepare output CSV
+	std::string metric_test_output = "metric_tests.csv";
+	createCSV(metric_test_output);
+	std::vector<std::vector<std::string>> rows = {
+		{ "Accurate Result", "Accurate Time", "Approximate Result", "Approximate Time", "Graph1 Size", "Graph 2 Size" }
+	};
+
+	// Iterate over each group of graphs by size
+	for (auto& [size, graphs] : graphs_by_size) {
+		// Test all pairs of graphs within the same size group
+		for (size_t i = 0; i < graphs.size(); ++i) {
+			for (size_t j = i + 1; j < graphs.size(); ++j) {
+				auto graph1 = graphs[i];
+				auto graph2 = graphs[j];
+
+				int time_of_accurate = 0;
+				int accurate = measure_execution_time(
+					time_of_accurate,
+					[&]() {
+						return graph_manager.getMetricDistance(graph1, graph2);
+					}
+				);
+
+				int time_of_approximate = 0;
+				int approximate = measure_execution_time(
+					time_of_approximate,
+					[&]() {
+						return graph_manager.tryGetMetricDistance(graph1, graph2);
+					}
+				);
+
+				std::vector<std::string> row = {
+					std::to_string(accurate),
+					std::to_string(time_of_accurate),
+					std::to_string(approximate),
+					std::to_string(time_of_approximate),
+					std::to_string(graph1.getNodesCount()),
+					std::to_string(graph2.getNodesCount())
+				};
+
+				rows.push_back(row);
+			}
+		}
+	}
+
+	// Write results to CSV
 	writeDataToCSV(metric_test_output, rows);
 }
+
 
 
 std::pair<int, int> AppController::getSelectedIndices(std::vector<GraphData> graphs_data) {
@@ -179,7 +199,7 @@ void AppController::display_help()
 		<< std::setw(25) << std::left << "  -f1 [nazwa_pliku1]" << " dla opcji -d\n"
 		<< std::setw(25) << std::left << "  -f2 [nazwa_pliku2]" << " dla opcji -d\n"
 		<< std::setw(25) << std::left << "  -r  [1-15]" << " dla opcji -h approx | both " << " postawowo 10\n"
-		<< std::setw(25) << std::left << "  -o, ---output  " << " long | short " << " podstawowo long\n\n"
+		<< std::setw(25) << std::left << "  -o, --output  " << " long | short " << " podstawowo long\n\n"
 		<< "Przyklady:\n"
 		<< "  " << program_name << " --help\n"
 		<< "  " << program_name << " -h approx -f graph1.txt\n"
