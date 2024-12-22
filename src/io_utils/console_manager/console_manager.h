@@ -213,7 +213,7 @@ struct ConsoleManager
                         write("|  rozszerzenie zaznaczone na macierzy sasiedztwa: (nie wyswietlone, za duzo wierzchołkow) \n");
                 }
 
-                write("|- liczba cykli hamiltona" + note + ": " + hamilton_cycles_count + " \n");
+                write("|- liczba cykli Hamiltona" + note + ": " + hamilton_cycles_count + " \n");
 
                 if (long_output)
                 {

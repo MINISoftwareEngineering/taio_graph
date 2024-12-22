@@ -376,7 +376,7 @@ void AppController::hamilton(ProgramCommand command)
 			if (command.param == 10)
 				param_note = " (wartosc domyslna)";
 
-			console_manager.write("\nParametr retryFactor dla algorytmu aproksymacyjnego: " + std::to_string(command.param) + param_note + "\n\n");
+			console_manager.write("\nParametr retryFactor dla algorytmu aproksymacyjnego: " + std::to_string(command.param) + param_note + "\n");
 			console_manager.write("Aproksymacyjne wyznaczanie rozszerzenia hamiltonowskiego rozpoczete...\n");
 			if (!graph_manager.tryFindMinimumExtentionForHamiltonCycleAndAllHamiltonCycles(graphs.at(i), command.param))
 				console_manager.write("Nie udalo sie znalezc aproksymacji rozszerzenia hamiltonowskiego\n");
