@@ -227,7 +227,7 @@ void AppController::distance(ProgramCommand command)
 	GraphData graph2 = graph_data_loader.loadGraphFromFile(command.files.at(1));
 
 	console_manager.write("\n==========================================================\n");
-	console_manager.write("\tWyznaczanie odległosci miedzy grafami\n");
+	console_manager.write("\tWyznaczanie odleglosci miedzy grafami\n");
 	console_manager.write("==========================================================\n\n");
 
 	if (command.long_output) {
@@ -242,12 +242,12 @@ void AppController::distance(ProgramCommand command)
 
 	if (command.algorithm_type == AlgorithmType::Exact || command.algorithm_type == AlgorithmType::Both) {
 		if (graph1.getNodesCount() <= 8 && graph2.getNodesCount() <= 8) {
-			console_manager.write("Obliczanie dokladnej metryki miedzy grafami...\n");
+			console_manager.write("Rozpoczeto obliczanie dokladnej odleglosci miedzy grafami...\n");
 			int distance = graph_manager.getMetricDistance(graph1, graph2);
-			console_manager.write("Dokladna metryka = " + std::to_string(distance) + " \n");
+			console_manager.write("|- Dokladna odleglosc grafow: " + std::to_string(distance) + " \n");
 		}
 		else {
-			console_manager.write("Obliczanie metryki dokladnej pominiete przez zbyt duzy rozmiar jednego z grafow.\n");
+			console_manager.write("Obliczanie dokladnej odleglosci pominiete przez zbyt duzy rozmiar jednego z grafow.\n");
 			console_manager.write("Rozmiary to: \n\t" +
 				std::to_string(graph1.getNodesCount()) + " (wczytany z pliku " + command.files.at(0) + " )\n" +
 				"\t" + std::to_string(graph2.getNodesCount()) + " (wczytany z pliku " + command.files.at(1) + " )\n");
@@ -256,9 +256,9 @@ void AppController::distance(ProgramCommand command)
 
 	if (command.algorithm_type == AlgorithmType::Approximate || command.algorithm_type == AlgorithmType::Both)
 	{
-		console_manager.write("Obliczanie aproksymacji metryki miedzy grafami...\n");
+		console_manager.write("Rozpoczeto obliczanie przyblizenia odleglosci miedzy grafami...\n");
 		int distance = graph_manager.tryGetMetricDistance(graph1, graph2);
-		console_manager.write("Aproksymacja metryki = " + std::to_string(distance) + " \n");
+		console_manager.write("|- Przyblizona odleglosc grafow: " + std::to_string(distance) + " \n");
 	}
 }
 
@@ -282,9 +282,9 @@ void AppController::size(ProgramCommand command)
 			console_manager.write("\n");
 		}
 
-		console_manager.write("Obliczanie rozmiaru grafu...\n");
+		console_manager.write("Rozpoczeto obliczanie rozmiaru grafu...\n");
 		int size = graph_manager.getGraphSize(graphs.at(i));
-		console_manager.write("Rozmiar grafu to = " + std::to_string(size) + "\n");
+		console_manager.write("|- Rozmiar grafu to: " + std::to_string(size) + "\n");
 	}
 }
 
@@ -414,19 +414,20 @@ void AppController::max_cycles(ProgramCommand command)
 			console_manager.write("Rozpoczeto dokladne znajodwanie najwiekszego cyklu...\n");
 			if (graphs.at(i).getNodesCount() <= 8) {
 				graph_manager.findLongestCycles(graphs.at(i));
-				console_manager.write("Najdluszy cykl znaleziony.\n");
+				console_manager.write("Najwiekszy cykl znaleziony.\n");
 				std::vector<GraphData> stub_vector = { graphs.at(i) };
 				console_manager.listLongestCycles(stub_vector);
 
 				if (command.long_output && !graphs.at(i).getLongestCycles().empty()) {
 					for (int j = 0; j < graphs.at(i).getLongestCycles().size(); j++)
 					{
-						console_manager.write("\n| Cykl nr ");
+						console_manager.write("| Cykl nr ");
 						console_manager.write(std::to_string(j + 1));
-						console_manager.write(":\n");
+						console_manager.write("\n| ");
 						auto cycle = graphs.at(i).getLongestCycles()[j];
 						console_manager.printCycle(cycle);
 						console_manager.writeCycleOnGraph(graphs.at(i), cycle);
+						console_manager.write("\n");
 					}
 
 				}
@@ -455,7 +456,7 @@ void AppController::max_cycles(ProgramCommand command)
 				//console_manager.writeCycleOnGraph(graphs.at(i), cycle);
 				for (int j = 0; j < graphs.at(i).getApproximateLongestCycles().size(); j++)
 				{
-					console_manager.write("\n|- Cykl nr ");
+					console_manager.write("| Cykl nr ");
 					console_manager.write(std::to_string(j+1));
 					console_manager.write("\n| ");
 					auto cycle = graphs.at(i).getApproximateLongestCycles()[j];

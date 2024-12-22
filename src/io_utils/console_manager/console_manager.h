@@ -104,7 +104,6 @@ struct ConsoleManager
                     std::chrono::milliseconds duration = graph_data.getPreciseHamiltonCycleTime();
 
                     //write("|  |- finding full solution time: " + full_execution_time + " ms  (finding minumum graph: " + find_extention_execution_time + " ms, finding hamilton cycles: " + find_cycles_execution_time + " ms) \n");
-                    write("|- czas wykonania: " + std::to_string(duration.count()) + "ms\n");
                     if (!graph_data.getPreciseHamiltonCycles().empty())
                     {
                         write("|- najmniejsze rozszerzenie (liczba krawedzi: " + std::to_string(graph_data.getPreciseHamiltonCycleGraphExtension().size()) + "): \n| [");
@@ -169,10 +168,6 @@ struct ConsoleManager
             }
             else
                 write("|  |- macierz sąsiedztwa: (nie wyświetlona, za dużo wierzchołków) \n");*/
-            if (long_output && graph_data.getNodesCount() > 1)
-                write("|- czas szukania wyniku: " + full_execution_time + " ms  (minimalne rozszerzenie: " + find_extention_execution_time + " ms, liczba cykli: " + find_cycles_execution_time + " ms) \n");
-            else
-                write("|- czas szukania wyniku: " + full_execution_time + " ms \n");
 
             if (graph_data.getNodesCount() == 1)
             {
@@ -318,16 +313,15 @@ struct ConsoleManager
                 if (graph_data.isLongestCyclesAssigned())
                 {
                     std::chrono::milliseconds duration = graph_data.getLongestCyclesTime();
-                    write("|  |- czas wykonywania funkcji: " + std::to_string(duration.count()) + "ms\n");
                     std::vector<std::vector<int>> longest_cycles = graph_data.getLongestCycles();
                     if (longest_cycles.size() == 0)
                     {
-                        write("|  |- Nie znaleziono cykli!\n");
+                        write("|- Nie znaleziono cykli!\n");
                     }
                     else
                     {
                         std::vector<int> first_longest_cycle = longest_cycles[0];
-                        write("|  |- dlugosc najdluzszego cyklu: " + std::to_string(first_longest_cycle.size()) + " (liczba cykli: " + std::to_string(longest_cycles.size()) + ")\n");
+                        write("|- dlugosc najdluzszego cyklu: " + std::to_string(first_longest_cycle.size()) + " (liczba cykli: " + std::to_string(longest_cycles.size()) + ")\n");
                     }
                 }
                 else
@@ -347,7 +341,6 @@ struct ConsoleManager
             int approximate_longest_cycles_count = graph_data.getApproximateLongestCycles().size();
             std::vector<std::vector<int>> approximate_longest_cycles_values = graph_data.getApproximateLongestCycles();
             write("|- Rozmiar grafu: " + std::to_string(graph_size) + ": \n");
-            write("|- czas wykonania: " + std::to_string(duration.count()) + "ms\n");
             if (approximate_longest_cycles_count > 0)
             {
                 write("|- Najdluzsze cykle (aproksymacyjny) (dlugosc najdluzszego cyklu: " + std::to_string(approximate_longest_cycles_values[0].size()) + ") : \n");
