@@ -10,6 +10,14 @@ bool InputManager::inputFileExists()
     return false;
 }
 
+bool InputManager::inputFileExists(std::string file_path) {
+    return std::filesystem::exists(file_path);
+}
+
+bool  InputManager::inputFilesExist(std::string file_path1, std::string file_path2) {
+    return inputFileExists(file_path1) && inputFileExists(file_path2);
+}
+
 void InputManager::openFile(std::string input_path)
 {
     if (fileStream.is_open()) 

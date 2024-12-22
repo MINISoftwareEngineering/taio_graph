@@ -237,7 +237,6 @@ void GraphManager::traverseNeighbours(GraphData& graph_data, std::vector<std::ve
 				int min_index = std::distance(current_path.begin(), min_vertex);
 				ordered_cycle.insert(ordered_cycle.end(), current_path.begin() + min_index, current_path.end());
 				ordered_cycle.insert(ordered_cycle.end(), current_path.begin(), current_path.begin() + min_index);
-				ordered_cycle.push_back(ordered_cycle.front());
 				if (std::find(longest_cycles.begin(), longest_cycles.end(), ordered_cycle) == longest_cycles.end())
 					longest_cycles.push_back(ordered_cycle);
 			}
@@ -433,7 +432,7 @@ int GraphManager::takeOutRandomValue(std::vector<int>& vec) {
 
 
 #pragma region hamiltonCycle
-void GraphManager::traverseOtherVertices(GraphData& graph_data, std::vector<std::pair<int, int>>& smallest_extension, std::vector<std::pair<int, int>>& current_extension, std::vector<int>& current_path, int& hamilton_cycle_count)
+void GraphManager::traverseOtherVertices(GraphData& graph_data, std::vector<std::pair<int, int>>& smallest_extension, std::vector<std::pair<int, int>>& current_extension, std::vector<int>& current_path, int& hamilton_cycle_count, std::vector<std::vector<int>>& hamilton_cycles)
 {
 	int last_vertex = current_path.back();
 	std::unordered_set<int> out_neighbours = graph_data.out_edges_by_node[last_vertex];
@@ -447,6 +446,14 @@ void GraphManager::traverseOtherVertices(GraphData& graph_data, std::vector<std:
 		{
 			smallest_extension.clear();
 			hamilton_cycle_count++;
+
+			std::vector<int> ordered_cycle;
+			auto min_vertex = std::min_element(current_path.begin(), current_path.end());
+			int min_index = std::distance(current_path.begin(), min_vertex);
+			ordered_cycle.insert(ordered_cycle.end(), current_path.begin() + min_index, current_path.end());
+			ordered_cycle.insert(ordered_cycle.end(), current_path.begin(), current_path.begin() + min_index);
+			if (std::find(hamilton_cycles.begin(), hamilton_cycles.end(), ordered_cycle) == hamilton_cycles.end())
+				hamilton_cycles.push_back(ordered_cycle);
 		}
 
 
@@ -469,7 +476,7 @@ void GraphManager::traverseOtherVertices(GraphData& graph_data, std::vector<std:
 			if (out_neighbours.find(i) == out_neighbours.end())
 				current_extension.push_back(std::pair<int, int>(last_vertex, i));
 			current_path.push_back(i);
-			traverseOtherVertices(graph_data, smallest_extension, current_extension, current_path, hamilton_cycle_count);
+			traverseOtherVertices(graph_data, smallest_extension, current_extension, current_path, hamilton_cycle_count, hamilton_cycles);
 			if (out_neighbours.find(i) == out_neighbours.end())
 				current_extension.pop_back();
 			current_path.pop_back();
@@ -480,23 +487,43 @@ void GraphManager::traverseOtherVertices(GraphData& graph_data, std::vector<std:
 
 void GraphManager::findHamiltonCycle(GraphData& graph_data)
 {
+	GraphData graph_data_temp = graph_data;
+	std::vector<std::vector<int>> hamilton_cycles;
+
 	auto start = std::chrono::high_resolution_clock::now();
 
 	std::vector<std::pair<int, int>> smallest_extension;
+	std::vector<std::pair<int, int>> temp_smallest_extension;
 	std::vector<std::pair<int, int>> current_extension;
 	std::vector<int> current_path;
 
 	int hamilton_cycle_count = 0;
 
-	for (int i = 0; i < graph_data.getNodesCount(); i++)
+	for (int i = 0; i < graph_data_temp.getNodesCount(); i++)
 	{
 		current_path.push_back(i);
-		traverseOtherVertices(graph_data, smallest_extension, current_extension, current_path, hamilton_cycle_count);
+		traverseOtherVertices(graph_data_temp, smallest_extension, current_extension, current_path, hamilton_cycle_count, hamilton_cycles);
 		current_path.pop_back();
 	}
 
-	hamilton_cycle_count /= graph_data.getNodesCount();
-	graph_data.assignHamiltonCyclesAndExtensions(smallest_extension, hamilton_cycle_count);
+	hamilton_cycle_count /= graph_data_temp.getNodesCount();
+	if (hamilton_cycle_count == 0 && graph_data_temp.getNodesCount() > 1)
+	{
+		for (int i = 0; i < smallest_extension.size(); i++)
+		{
+			graph_data_temp.out_edges_by_node[smallest_extension[i].first].insert(smallest_extension[i].second);
+			graph_data_temp.in_edges_by_node[smallest_extension[i].second].insert(smallest_extension[i].first);
+		}	
+		for (int i = 0; i < graph_data_temp.getNodesCount(); i++)
+		{
+			current_path.push_back(i);
+			traverseOtherVertices(graph_data_temp, temp_smallest_extension, current_extension, current_path, hamilton_cycle_count, hamilton_cycles);
+			current_path.pop_back();
+		}
+		hamilton_cycle_count /= graph_data_temp.getNodesCount();
+	}
+
+	graph_data.assignHamiltonCyclesAndExtensions(smallest_extension, hamilton_cycle_count, hamilton_cycles);
 
 	auto end = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
@@ -554,6 +581,13 @@ bool GraphManager::tryGetRandomUnvisitedNode(int nodes_count, std::unordered_set
 
 bool GraphManager::tryFindMinimumExtentionForHamiltonCycle(GraphData& graph_data, int retry_factor)
 {
+	if (graph_data.getNodesCount() == 1)
+	{
+		graph_extention_t ext;
+		graph_data.setHamiltonCycleGraphExtention(ext);
+		return true;
+	}
+
 	int iterations = std::max(getEdgesDensity(graph_data), 1) * retry_factor;
 
 	for (int i = 0; i < iterations; ++i)
@@ -763,9 +797,6 @@ int GraphManager::getEditDistance(GraphData graph_1, GraphData graph_2, int size
 
 #pragma region metricApproximation
 int GraphManager::tryGetMetricDistance(GraphData graph_1, GraphData graph_2) {
-	sortGraph(graph_1);
-	sortGraph(graph_2);
-
 	GraphData larger_graph = graph_1;
 	GraphData smaller_graph = graph_2;
 
@@ -778,7 +809,10 @@ int GraphManager::tryGetMetricDistance(GraphData graph_1, GraphData graph_2) {
 	int size_difference = larger_graph.getNodesCount() - smaller_graph.getNodesCount();
 	smaller_graph.setNodesCount(larger_graph.getNodesCount());
 
-	return getEditDistance(graph_1, graph_2, size_difference);
+	sortGraph(larger_graph);
+	sortGraph(smaller_graph);
+
+	return getEditDistance(smaller_graph, larger_graph, size_difference);
 }
 
 void GraphManager::sortGraph(GraphData& graph)
@@ -788,18 +822,17 @@ void GraphManager::sortGraph(GraphData& graph)
 		nodes.push_back(i);
 	}
 
-
-	std::stable_sort(nodes.begin(), nodes.end(), [&graph](int a, int b) {
-		size_t out_edges_a = graph.out_edges_by_node[a].size();
-		size_t out_edges_b = graph.out_edges_by_node[b].size();
-		return out_edges_a > out_edges_b;
-		});
-
-	std::stable_sort(nodes.begin(), nodes.end(), [&graph](int a, int b) {
+	std::sort(nodes.begin(), nodes.end(), [&graph](int a, int b) {
 		size_t in_edges_a = graph.in_edges_by_node[a].size();
 		size_t in_edges_b = graph.in_edges_by_node[b].size();
-		return in_edges_a > in_edges_b;
-		});
+		size_t out_edges_a = graph.out_edges_by_node[a].size();
+		size_t out_edges_b = graph.out_edges_by_node[b].size();
+
+		if (in_edges_a != in_edges_b) {
+			return in_edges_a > in_edges_b;
+		}
+		return out_edges_a > out_edges_b;
+	});
 
 	std::unordered_map<int, std::unordered_set<int>> sorted_out_edges;
 	std::unordered_map<int, std::unordered_set<int>> sorted_in_edges;

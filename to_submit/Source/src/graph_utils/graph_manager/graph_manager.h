@@ -8,16 +8,16 @@ struct GraphManager
 #pragma region general
 public:
 	int getGraphSize(GraphData& graph_data);
+	void addEdge(GraphData& graph_data, edge new_edge);
+	bool hasEdge(GraphData& graph_data, int start_node, int end_node);
 private:
 	int getEdgesDensity(GraphData& graph_data);
 	void transformToGraphWithoutEdgesAdjecentToLeafNode(GraphData& graph_data);
-	void addEdge(GraphData& graph_data, edge new_edge);
 	bool isNodeWithoutOutEdges(GraphData& graph_data, int node_row);
 	bool isNodeWithoutInEdges(GraphData& graph_data, int node_col);
 	void removeOutEdges(GraphData& graph_data, int node);
 	void removeInEdges(GraphData& graph_data, int node);
 	bool tryGetRandomNode(int nodes_count, int& random_node);
-	bool hasEdge(GraphData& graph_data, int start_node, int end_node);
 public:
 	void generateGraphPermutations(GraphData& graph_data, std::function<bool(GraphData)> callback);
 #pragma endregion
@@ -38,7 +38,7 @@ private:
 
 #pragma region hamiltonCycle
 public:
-	void traverseOtherVertices(GraphData& graph_data, std::vector<std::pair<int, int>>& smallest_extension, std::vector<std::pair<int, int>>& current_extension, std::vector<int>& current_path, int& hamilton_cycle_count);
+	void traverseOtherVertices(GraphData& graph_data, std::vector<std::pair<int, int>>& smallest_extension, std::vector<std::pair<int, int>>& current_extension, std::vector<int>& current_path, int& hamilton_cycle_count, std::vector<std::vector<int>>& longest_cycles);
 	void findHamiltonCycle(GraphData& graph_data);
 #pragma endregion
 
