@@ -242,7 +242,7 @@ void AppController::distance(ProgramCommand command)
 
 	if (command.algorithm_type == AlgorithmType::Exact || command.algorithm_type == AlgorithmType::Both) {
 
-		if (graph1.getNodesCount() > 8 || graph2.getNodesCount()) {
+		if (graph1.getNodesCount() > 8 || graph2.getNodesCount() > 8) {
 			console_manager.write("Jeden z grafow ma wiecej niz 8 wierzcholkow. Obliczenia moga trwac dlugo\n");
 			console_manager.write("Rozmiary to: \n\t" +
 				std::to_string(graph1.getNodesCount()) + " (wczytany z pliku " + command.files.at(0) + " )\n" +
